@@ -1,11 +1,15 @@
 import {Application, Container} from 'pixi.js';
 import {loadTextures} from './textures/textures';
 import {getStartingHouse} from './rooms/light-world/StartingHouse';
+import {getLink} from './entities/Link';
+
+const WIDTH = 256;
+const HEIGHT = 224;
 
 //Create a Pixi Application
 const app = new Application({
-  width: 256,
-  height: 224,
+  width: WIDTH,
+  height: HEIGHT,
   antialiasing: true,
   transparent: false,
 });
@@ -17,13 +21,17 @@ loadTextures(setup);
 
 //Define variables that might be used in more
 //than one function
-let state, explorer, gameScene, gameOverScene;
+let state, link, keyboard, gameScene, background, gameOverScene;
+
 function setup() {
   //Make the game scene and add it to the stage
   gameScene = new Container();
-  app.stage.addChild(gameScene);
+  background = new Container();
+  app.stage.addChild(background, gameScene);
 
-  renderRoom(getStartingHouse(), gameScene);
+  renderRoom(getStartingHouse(), background);
+  link = getLink();
+  gameScene.addChild(link);
 
   //Make the sprites and add them to the `gameScene`
   //Create an alias for the texture atlas frame ids
@@ -41,60 +49,9 @@ function setup() {
   //Make the `gameOver` scene invisible when the game first starts
   gameOverScene.visible = false;
 
-  //Capture the keyboard arrow keys
-  let left = keyboard(37),
-      up = keyboard(38),
-      right = keyboard(39),
-      down = keyboard(40);
-  //Left arrow key `press` method
-  left.press = function() {
-    //Change the explorer's velocity when the key is pressed
-    explorer.vx = -5;
-    explorer.vy = 0;
-  };
-  //Left arrow key `release` method
-  left.release = function() {
-    //If the left arrow has been released, and the right arrow isn't down,
-    //and the explorer isn't moving vertically:
-    //Stop the explorer
-    if (!right.isDown && explorer.vy === 0) {
-      explorer.vx = 0;
-    }
-  };
-  //Up
-  up.press = function() {
-    explorer.vy = -5;
-    explorer.vx = 0;
-  };
-  up.release = function() {
-    if (!down.isDown && explorer.vx === 0) {
-      explorer.vy = 0;
-    }
-  };
-  //Right
-  right.press = function() {
-    explorer.vx = 5;
-    explorer.vy = 0;
-  };
-  right.release = function() {
-    if (!left.isDown && explorer.vy === 0) {
-      explorer.vx = 0;
-    }
-  };
-  //Down
-  down.press = function() {
-    explorer.vy = 5;
-    explorer.vx = 0;
-  };
-  down.release = function() {
-    if (!up.isDown && explorer.vx === 0) {
-      explorer.vy = 0;
-    }
-  };
-  //Set the game state
+  keyboard = createKeyboard();
   state = play;
 
-  //Start the game loop
   app.ticker.add(delta => gameLoop(delta));
 }
 
@@ -115,14 +72,16 @@ function renderRoom(room, gameScene) {
 function gameLoop(delta){
   //Update the current game state:
   state(delta);
+
+  resetKeyboardToggles(keyboard);
 }
 
 function play(delta) {
-
+  link.update(keyboard, {x: 0, y: 0, width: WIDTH, height: HEIGHT}, background);
 }
 
 /* Helper functions */
-function contain(sprite, container) {
+export function contain(sprite, container) {
   let collision = undefined;
   //Left
   if (sprite.x < container.x) {
@@ -186,49 +145,63 @@ function hitTestRectangle(r1, r2) {
   }
   //`hit` will be either `true` or `false`
   return hit;
-};
+}
 
-//The `keyboard` helper function
-function keyboard(keyCode) {
-  const key = {
-    code: keyCode,
-    isDown: false,
-    isUp: true,
-    press: undefined,
-    releace: undefined
+function createKeyboard() {
+  const inputs = {
+    left: {
+      pressed: false,
+      toggled: false
+    },
+    up: {
+      pressed: false,
+      toggled: false
+    },
+    right: {
+      pressed: false,
+      toggled: false
+    },
+    down: {
+      pressed: false,
+      toggled: false
+    },
+    directionChange: false
   };
+  const keycodes = {
+    37: 'left',
+    38: 'up',
+    39: 'right',
+    40: 'down'
+  }
 
-  //The `downHandler`
-  key.downHandler = function(event) {
-    if (event.keyCode === key.code) {
-      if (key.isUp && key.press) {
-        key.press();
-      }
-      key.isDown = true;
-      key.isUp = false;
+  function downHandler(event) {
+    const key = inputs[keycodes[event.keyCode]];
+    if (key && !key.pressed) {
+      key.toggled = inputs.directionChange = true;
+      key.pressed = true;
+      event.preventDefault();
     }
-    event.preventDefault();
-  };
+  }
 
-  //The `upHandler`
-  key.upHandler = function(event) {
-    if (event.keyCode === key.code) {
-      if (key.isDown && key.release) {
-        key.release();
-      }
-      key.isDown = false;
-      key.isUp = true;
+  function upHandler(event) {
+    const key = inputs[keycodes[event.keyCode]];
+    if (key && key.pressed) {
+      key.toggled = inputs.directionChange = true;
+      key.pressed = false;
+      event.preventDefault();
     }
-    event.preventDefault();
-  };
+  }
 
-  //Attach event listeners
-  window.addEventListener(
-    "keydown", key.downHandler.bind(key), false
-  );
-  window.addEventListener(
-    "keyup", key.upHandler.bind(key), false
-  );
+  window.addEventListener("keydown", downHandler, false);
+  window.addEventListener("keyup", upHandler, false);
 
-  return key;
+  return inputs;
+}
+
+function resetKeyboardToggles(keyboard) {
+  keyboard.directionChange = false;
+  keyboard.left.toggled = false;
+  keyboard.up.toggled = false;
+  keyboard.right.toggled = false;
+  keyboard.down.toggled = false;
 }
