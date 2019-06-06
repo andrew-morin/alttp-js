@@ -8,5 +8,6 @@ export function loadTextures(cb) {
     .add(lightWorld)
     .add(lightWorldFieldSprite)
     .add(link)
+    .add('link/LinkMovement.json')
     .load(cb);
 }

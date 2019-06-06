@@ -1,6 +1,7 @@
 import {Loader, Rectangle, Texture, AnimatedSprite} from 'pixi.js';
 import {contain} from '../index';
 import linkTexture from '../textures/link.gif';
+import linkMovementTexture from '../textures/link.gif';
 
 const cardinal = {
   speed: 1,
@@ -19,7 +20,8 @@ export function getLink() {
   if (link) {
     return link;
   }
-
+  const linkMovementSheet = Loader.shared.resources['link/LinkMovement.json'];
+  const standDownTexture = linkMovementSheet['standDown.png'];
   const downStandTexture = Loader.shared.resources[linkTexture].texture;
   const downStandRectangle = new Rectangle(90, 13, 16, 22);
   downStandTexture.frame = downStandRectangle;
@@ -29,9 +31,8 @@ export function getLink() {
   const down1Rectangle = new Rectangle(122, 13, 16, 22);
   down1Texture.frame = down1Rectangle;
 
-  link = new AnimatedSprite([downStandTexture, down1Texture]);
-  console.log(link.textures)
-  link.animationSpeed = 1/60;
+  link = new AnimatedSprite([standDownTexture]);
+  link.animationSpeed = 1/4;
   link.play();
   link.xSub = 0;
   link.ySub = 0;
