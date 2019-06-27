@@ -3,13 +3,15 @@ import {loadTextures} from './textures';
 import {getStartingHouse} from './rooms/light-world/StartingHouse';
 import {getLink} from './entities/Link';
 
-const WIDTH = 256;
-const HEIGHT = 224;
+const SCREEN_WIDTH = 256;
+const SCREEN_HEIGHT = 224;
+const HALF_SCREEN_WIDTH = SCREEN_WIDTH / 2;
+const HALF_SCREEN_HEIGHT = SCREEN_HEIGHT / 2;
 
 //Create a Pixi Application
 const app = new Application({
-  width: WIDTH,
-  height: HEIGHT,
+  width: SCREEN_WIDTH,
+  height: SCREEN_HEIGHT,
   antialiasing: true,
   transparent: false,
 });
@@ -27,13 +29,13 @@ function setup() {
   //Make the game scene and add it to the stage
   gameScene = new Container();
   background = new Container();
-  app.stage.addChild(background, gameScene);
+  app.stage.addChild(gameScene);
 
   renderRoom(getStartingHouse(), background);
   link = getLink();
-  link.x = background.width / 2;
-  link.y = background.height / 2;
-  gameScene.addChild(link);
+  link.x = SCREEN_WIDTH / 2;
+  link.y = SCREEN_HEIGHT / 2;
+  gameScene.addChild(background, link);
 
   //Make the sprites and add them to the `gameScene`
   //Create an alias for the texture atlas frame ids
@@ -79,31 +81,52 @@ function gameLoop(delta){
 }
 
 function play(delta) {
-  link.update(keyboard, {x: 0, y: 0, width: WIDTH, height: HEIGHT}, background);
+  link.update(keyboard, background);
+  updateGameScenePosition();
+}
+
+function updateGameScenePosition() {
+  if (link.x < HALF_SCREEN_WIDTH) {
+    gameScene.x = 0;
+  } else if (link.x > gameScene.width - HALF_SCREEN_WIDTH) {
+    gameScene.x = -(gameScene.width - SCREEN_WIDTH);
+  } else {
+    gameScene.x = -(link.x - HALF_SCREEN_WIDTH);
+  }
+
+  if (link.y < HALF_SCREEN_HEIGHT) {
+    gameScene.y = 0;
+  } else if (link.y > gameScene.height - HALF_SCREEN_HEIGHT) {
+    gameScene.y = -(gameScene.height - SCREEN_HEIGHT);
+  } else {
+    gameScene.y = -(link.y - HALF_SCREEN_HEIGHT);
+  }
 }
 
 /* Helper functions */
 export function contain(sprite, container) {
-  const bounds = sprite.getBounds()
+  const localBounds = sprite.getLocalBounds();
+  const x = sprite.x + localBounds.x;
+  const y = sprite.y + localBounds.y;
   let collision = undefined;
   //Left
-  if (bounds.x < container.x) {
-    sprite.x = container.x + sprite.anchor.x * bounds.width;
+  if (x < container.x) {
+    sprite.x = container.x + sprite.anchor.x * sprite.width;
     collision = "left";
   }
   //Top
-  if (bounds.y < container.y) {
-    sprite.y = container.y + sprite.anchor.y * bounds.height;
+  if (y < container.y) {
+    sprite.y = container.y + sprite.anchor.y * sprite.height;
     collision = "top";
   }
   //Right
-  if (bounds.x + bounds.width > container.width) {
-    sprite.x = container.x + container.width - bounds.width + sprite.anchor.x * bounds.width;
+  if (x + sprite.width > container.width) {
+    sprite.x = container.x + container.width - sprite.width + sprite.anchor.x * sprite.width;
     collision = "right";
   }
   //Bottom
-  if (bounds.y + bounds.height > container.height) {
-    sprite.y = container.y + container.height - bounds.height + sprite.anchor.y * bounds.height;
+  if (y + sprite.height > container.height) {
+    sprite.y = container.y + container.height - sprite.height + sprite.anchor.y * sprite.height;
     collision = "bottom";
   }
   //Return the `collision` value

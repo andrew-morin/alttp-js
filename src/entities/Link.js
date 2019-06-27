@@ -52,7 +52,7 @@ function updateLink(keyboard, window, background) {
         link.textures = link.spritesheet.animations.walkLeft;
         link.direction = 'Left';
       }
-    } else if (vy === 1 && link.direction !== 'Down') {
+    } else if (vy === 1) {
       if (vx === 0 || (vx === -1 && link.direction !== 'Left') || (vx === 1 && link.direction !== 'Right')) {
         link.textures = link.spritesheet.animations.walkDown;
         link.direction = 'Down'
@@ -76,18 +76,19 @@ function updateLink(keyboard, window, background) {
 
 function updatePosition(link, movement, vx, vy) {
   const {speed, subpixel} = movement;
-  link.x += speed * vx;
-  link.y += speed * vy;
   link.xSub += subpixel * vx;
   link.ySub += subpixel * vy;
-  updateSubpixel(link, 'x');
-  updateSubpixel(link, 'y');
+  const finalVx = updateSubpixel(link, 'x', speed * vx);
+  const finalVy = updateSubpixel(link, 'y', speed * vy);
+  link.x += finalVx;
+  link.y += finalVy;
 }
 
-function updateSubpixel(link, coor) {
+function updateSubpixel(link, coor, vel) {
   const update = Math.floor(link[coor+'Sub']);
   if (update !== 0) {
-    link[coor] += update;
     link[coor+'Sub'] -= update;
+    return vel + update;
   }
+  return vel;
 }
