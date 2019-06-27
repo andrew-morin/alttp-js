@@ -2,6 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   mode: 'development',
@@ -11,14 +12,14 @@ module.exports = {
     path: path.resolve(__dirname, 'dist')
   },
   performance: { hints: false },
-  devtool: "source-map",
+  devtool: "inline-source-map",
   devServer: {
     contentBase: path.resolve(__dirname, 'dist'),
     open: true,
     hot: true
   },
   resolve: {
-      extensions: ['.js']
+      extensions: ['.js', '.json']
   },
   module: {
     rules: [
@@ -27,12 +28,6 @@ module.exports = {
         exclude: /node_modules/,
         use: {
           loader: 'babel-loader'
-        }
-      },
-      {
-        test: /\.json$/,
-        use: {
-          loader: 'json-loader'
         }
       },
       {
@@ -54,6 +49,10 @@ module.exports = {
       title: "A Link to the Past JS"
     }),
     new webpack.NamedModulesPlugin(),
-    new webpack.HotModuleReplacementPlugin()
+    new webpack.HotModuleReplacementPlugin(),
+    new CopyWebpackPlugin([{
+      from: 'src/assets',
+      to: 'assets'
+    }])
   ]
 };

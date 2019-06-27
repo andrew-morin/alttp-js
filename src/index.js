@@ -1,5 +1,5 @@
 import {Application, Container} from 'pixi.js';
-import {loadTextures} from './textures/textures';
+import {loadTextures} from './textures';
 import {getStartingHouse} from './rooms/light-world/StartingHouse';
 import {getLink} from './entities/Link';
 
@@ -31,6 +31,8 @@ function setup() {
 
   renderRoom(getStartingHouse(), background);
   link = getLink();
+  link.x = background.width / 2;
+  link.y = background.height / 2;
   gameScene.addChild(link);
 
   //Make the sprites and add them to the `gameScene`
@@ -82,28 +84,32 @@ function play(delta) {
 
 /* Helper functions */
 export function contain(sprite, container) {
+  const bounds = sprite.getBounds()
   let collision = undefined;
   //Left
-  if (sprite.x < container.x) {
-    sprite.x = container.x;
+  if (bounds.x < container.x) {
+    sprite.x = container.x + sprite.anchor.x * bounds.width;
     collision = "left";
   }
   //Top
-  if (sprite.y < container.y) {
-    sprite.y = container.y;
+  if (bounds.y < container.y) {
+    sprite.y = container.y + sprite.anchor.y * bounds.height;
     collision = "top";
   }
   //Right
-  if (sprite.x + sprite.width > container.width) {
-    sprite.x = container.width - sprite.width;
+  if (bounds.x + bounds.width > container.width) {
+    sprite.x = container.x + container.width - bounds.width + sprite.anchor.x * bounds.width;
     collision = "right";
   }
   //Bottom
-  if (sprite.y + sprite.height > container.height) {
-    sprite.y = container.height - sprite.height;
+  if (bounds.y + bounds.height > container.height) {
+    sprite.y = container.y + container.height - bounds.height + sprite.anchor.y * bounds.height;
     collision = "bottom";
   }
   //Return the `collision` value
+  if (collision) {
+    console.log(collision);
+  }
   return collision;
 }
 

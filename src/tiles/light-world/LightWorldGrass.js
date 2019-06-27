@@ -1,5 +1,5 @@
 import {Loader, Rectangle, Sprite} from 'pixi.js';
-import lightWorld from '../../textures/light-world/light_world.png';
+import lightWorld from '../../assets/textures/light-world/light_world.png';
 
 export default function lightWorldGrass() {
   const texture = Loader.shared.resources[lightWorld].texture;

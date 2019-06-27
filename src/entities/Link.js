@@ -1,55 +1,69 @@
 import {Loader, Rectangle, Texture, AnimatedSprite} from 'pixi.js';
 import {contain} from '../index';
-import linkTexture from '../textures/link.gif';
-import linkMovementTexture from '../textures/link.gif';
+import linkTexture from '../assets/textures/link.gif';
+import linkMovementTexture from '../assets/textures/link.gif';
 
 const cardinal = {
   speed: 1,
   subpixel: 0.5
 }
-
 const diagonal = {
   speed: 1,
   subpixel: 0
 }
-
-const COLLISION_POINT = {x: 8, y: 20};
 
 let link;
 export function getLink() {
   if (link) {
     return link;
   }
-  const linkMovementSheet = Loader.shared.resources['link/LinkMovement.json'];
-  const standDownTexture = linkMovementSheet['standDown.png'];
-  const downStandTexture = Loader.shared.resources[linkTexture].texture;
-  const downStandRectangle = new Rectangle(90, 13, 16, 22);
-  downStandTexture.frame = downStandRectangle;
-
-
-  const down1Texture = new Texture(Loader.shared.resources[linkTexture].texture);
-  const down1Rectangle = new Rectangle(122, 13, 16, 22);
-  down1Texture.frame = down1Rectangle;
+  const linkMovementSheet = Loader.shared.resources['assets/textures/link/LinkMovement.json'].spritesheet;
+  const standDownTexture = linkMovementSheet.textures['standDown.png'];
 
   link = new AnimatedSprite([standDownTexture]);
   link.animationSpeed = 1/4;
   link.play();
+
   link.xSub = 0;
   link.ySub = 0;
   link.update = updateLink;
+
+  link.spritesheet = linkMovementSheet;
+  link.direction = 'Down';
 
   return link;
 }
 
 function updateLink(keyboard, window, background) {
+  const vx = keyboard.left.pressed ? -1 : keyboard.right.pressed ? 1 : 0;
+  const vy = keyboard.up.pressed ? -1 : keyboard.down.pressed ? 1 : 0;
   // Reset subpixels when input has changed
   if (keyboard.directionChange) {
     link.xSub = 0;
     link.ySub = 0;
+    if (vy === 0) {
+      if (vx === 0) {
+        link.textures = [link.spritesheet.textures['stand' + link.direction + '.png']];
+      }
+      if (vx === 1) {
+        link.textures = link.spritesheet.animations.walkRight;
+        link.direction = 'Right';
+      } else if (vx === -1) {
+        link.textures = link.spritesheet.animations.walkLeft;
+        link.direction = 'Left';
+      }
+    } else if (vy === 1 && link.direction !== 'Down') {
+      if (vx === 0 || (vx === -1 && link.direction !== 'Left') || (vx === 1 && link.direction !== 'Right')) {
+        link.textures = link.spritesheet.animations.walkDown;
+        link.direction = 'Down'
+      }
+    } else if (vy === -1) {
+      if (vx === 0 || (vx === -1 && link.direction !== 'Left') || (vx === 1 && link.direction !== 'Right')) {
+        link.textures = link.spritesheet.animations.walkUp;
+        link.direction = 'Up'
+      }
+    }
   }
-
-  const vx = keyboard.left.pressed ? -1 : keyboard.right.pressed ? 1 : 0;
-  const vy = keyboard.up.pressed ? -1 : keyboard.down.pressed ? 1 : 0;
 
   // Only update link if he's moving
   if (vx !== 0 || vy !== 0) {
