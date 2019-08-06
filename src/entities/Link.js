@@ -21,7 +21,7 @@ export function getLink() {
   const standDownTexture = linkMovementSheet.textures['standDown.png'];
 
   link = new AnimatedSprite([standDownTexture]);
-  link.animationSpeed = 1/4;
+  link.animationSpeed = 1/2;
   link.play();
 
   link.xSub = 0;
@@ -29,39 +29,60 @@ export function getLink() {
   link.update = updateLink;
 
   link.spritesheet = linkMovementSheet;
-  link.direction = 'Down';
+  // TODO: Move action and direction to enums
+  link.state = {
+    action: 'stand',
+    direction: 'Down'
+  };
 
   return link;
 }
 
 function updateLink(keyboard, window, background) {
-  const vx = keyboard.left.pressed ? -1 : keyboard.right.pressed ? 1 : 0;
-  const vy = keyboard.up.pressed ? -1 : keyboard.down.pressed ? 1 : 0;
-  // Reset subpixels when input has changed
-  if (keyboard.directionChange) {
+  const { left, right, up, down, directionChange } = keyboard;
+  const { state: { action, direction }} = link;
+  const vx = left.pressed ? -1 : right.pressed ? 1 : 0;
+  const vy = up.pressed ? -1 : down.pressed ? 1 : 0;
+  let newAction = vx !== 0 || vy !== 0 ? 'walk' : 'stand';
+  let newDirection = direction;
+
+  if (directionChange && newAction === 'walk') {
+    switch (vx) {
+      case 0:
+        newDirection = vy === 1 ? 'Down' : 'Up';
+        break;
+      case 1:
+        if (vy === 0 || direction === 'Right') {
+          newDirection = 'Right'
+        }
+        if (vy === 1 && 'Down' !== direction || vy === -1 && 'Up' !== direction) {
+          newDirection = 'Right'
+        }
+        break;
+      case -1:
+        if (vy === 0 || direction === 'Left') {
+          newDirection = 'Left'
+        }
+        if (vy === 1 && 'Down' !== direction || vy === -1 && 'Up' !== direction) {
+          newDirection = 'Left'
+        }
+        break;
+    }
+  }
+
+  // Reset subpixels and set new textures when direction has changed or action changed
+  if (newDirection !== direction || newAction !== action) {
     link.xSub = 0;
     link.ySub = 0;
-    if (vy === 0) {
-      if (vx === 0) {
-        link.textures = [link.spritesheet.textures['stand' + link.direction + '.png']];
-      }
-      if (vx === 1) {
-        link.textures = link.spritesheet.animations.walkRight;
-        link.direction = 'Right';
-      } else if (vx === -1) {
-        link.textures = link.spritesheet.animations.walkLeft;
-        link.direction = 'Left';
-      }
-    } else if (vy === 1) {
-      if (vx === 0 || (vx === -1 && link.direction !== 'Left') || (vx === 1 && link.direction !== 'Right')) {
-        link.textures = link.spritesheet.animations.walkDown;
-        link.direction = 'Down'
-      }
-    } else if (vy === -1) {
-      if (vx === 0 || (vx === -1 && link.direction !== 'Left') || (vx === 1 && link.direction !== 'Right')) {
-        link.textures = link.spritesheet.animations.walkUp;
-        link.direction = 'Up'
-      }
+    link.state = {
+      action: newAction,
+      direction: newDirection
+    };
+    if (newAction === 'walk') {
+      // TODO: rename textures to snake case, e.g. walk_right
+      link.textures = link.spritesheet.animations['walk' + newDirection];
+    } else if (newAction === 'stand') {
+      link.textures = [link.spritesheet.textures['stand' + newDirection + '.png']];
     }
   }
 
