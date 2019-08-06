@@ -12,13 +12,24 @@ const diagonal = {
   subpixel: 0
 }
 
+const Directions = Object.freeze({
+  UP: 'Up',
+  DOWN: 'Down',
+  LEFT: 'Left',
+  RIGHT: 'Right'
+})
+const Actions = Object.freeze({
+  STAND: 'stand',
+  WALK: 'walk'
+})
+
 let link;
 export function getLink() {
   if (link) {
     return link;
   }
   const linkMovementSheet = Loader.shared.resources['assets/textures/link/LinkMovement.json'].spritesheet;
-  const standDownTexture = linkMovementSheet.textures['standDown.png'];
+  const standDownTexture = linkMovementSheet.textures[Actions.STAND + Directions.DOWN + '.png'];
 
   link = new AnimatedSprite([standDownTexture]);
   link.animationSpeed = 1/2;
@@ -29,10 +40,9 @@ export function getLink() {
   link.update = updateLink;
 
   link.spritesheet = linkMovementSheet;
-  // TODO: Move action and direction to enums
   link.state = {
-    action: 'stand',
-    direction: 'Down'
+    action: Actions.STAND,
+    direction: Directions.DOWN
   };
 
   return link;
@@ -43,28 +53,31 @@ function updateLink(keyboard, window, background) {
   const { state: { action, direction }} = link;
   const vx = left.pressed ? -1 : right.pressed ? 1 : 0;
   const vy = up.pressed ? -1 : down.pressed ? 1 : 0;
-  let newAction = vx !== 0 || vy !== 0 ? 'walk' : 'stand';
+  const moving = vx !== 0 || vy !== 0;
+  let newAction = moving ? Actions.WALK : Actions.STAND;
   let newDirection = direction;
 
-  if (directionChange && newAction === 'walk') {
+  // TODO: Factor out to helper function
+  // TODO: Factor out cases 1 and -1 to separate helper function
+  if (directionChange && moving) {
     switch (vx) {
       case 0:
-        newDirection = vy === 1 ? 'Down' : 'Up';
+        newDirection = vy === 1 ? Directions.DOWN : Directions.UP;
         break;
       case 1:
-        if (vy === 0 || direction === 'Right') {
-          newDirection = 'Right'
+        if (vy === 0 || direction === Directions.RIGHT) {
+          newDirection = Directions.RIGHT
         }
-        if (vy === 1 && 'Down' !== direction || vy === -1 && 'Up' !== direction) {
-          newDirection = 'Right'
+        if (vy === 1 && Directions.DOWN !== direction || vy === -1 && Directions.UP !== direction) {
+          newDirection = Directions.RIGHT
         }
         break;
       case -1:
-        if (vy === 0 || direction === 'Left') {
-          newDirection = 'Left'
+        if (vy === 0 || direction === Directions.LEFT) {
+          newDirection = Directions.LEFT
         }
-        if (vy === 1 && 'Down' !== direction || vy === -1 && 'Up' !== direction) {
-          newDirection = 'Left'
+        if (vy === 1 && Directions.DOWN !== direction || vy === -1 && Directions.UP !== direction) {
+          newDirection = Directions.LEFT
         }
         break;
     }
@@ -78,11 +91,11 @@ function updateLink(keyboard, window, background) {
       action: newAction,
       direction: newDirection
     };
-    if (newAction === 'walk') {
+    if (newAction === Actions.WALK) {
       // TODO: rename textures to snake case, e.g. walk_right
-      link.textures = link.spritesheet.animations['walk' + newDirection];
-    } else if (newAction === 'stand') {
-      link.textures = [link.spritesheet.textures['stand' + newDirection + '.png']];
+      link.textures = link.spritesheet.animations[Actions.WALK + newDirection];
+    } else if (newAction === Actions.STAND) {
+      link.textures = [link.spritesheet.textures[Actions.STAND + newDirection + '.png']];
     }
   }
 
