@@ -52,8 +52,8 @@ export function getLink() {
 function updateLink(keyboard, window, background) {
   const { left, right, up, down, directionChange } = keyboard;
   const { state } = link;
-  const vx = left.pressed ? -1 : right.pressed ? 1 : 0;
-  const vy = up.pressed ? -1 : down.pressed ? 1 : 0;
+  const vx = right.pressed ? 1 : left.pressed ? -1 : 0;
+  const vy = down.pressed ? 1 : up.pressed ? -1 : 0;
   const moving = vx !== 0 || vy !== 0;
   const newAction = moving ? Actions.WALK : Actions.STAND;
   const newDirection = getNewDirection(directionChange, vx, vy, state.direction);
