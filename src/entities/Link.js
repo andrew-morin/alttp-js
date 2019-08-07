@@ -13,10 +13,10 @@ const diagonal = {
 }
 
 const Directions = Object.freeze({
-  UP: 'Up',
-  DOWN: 'Down',
-  LEFT: 'Left',
-  RIGHT: 'Right'
+  UP: 'up',
+  DOWN: 'down',
+  LEFT: 'left',
+  RIGHT: 'right'
 })
 const Actions = Object.freeze({
   STAND: 'stand',
@@ -29,7 +29,7 @@ export function getLink() {
     return link;
   }
   const linkMovementSheet = Loader.shared.resources['assets/textures/link/LinkMovement.json'].spritesheet;
-  const standDownTexture = linkMovementSheet.textures[Actions.STAND + Directions.DOWN + '.png'];
+  const standDownTexture = linkMovementSheet.textures[`${Actions.STAND}_${Directions.DOWN}.png`];
 
   link = new AnimatedSprite([standDownTexture]);
   link.animationSpeed = 1/2;
@@ -72,10 +72,9 @@ function updateLink(keyboard, window, background) {
   if (hasLinkStateChanged(state, newState)) {
     link.state = newState;
     if (newAction === Actions.WALK) {
-      // TODO: rename textures to snake case, e.g. walk_right
-      link.textures = link.spritesheet.animations[Actions.WALK + newDirection];
+      link.textures = link.spritesheet.animations[`${Actions.WALK}_${newDirection}`];
     } else if (newAction === Actions.STAND) {
-      link.textures = [link.spritesheet.textures[Actions.STAND + newDirection + '.png']];
+      link.textures = [link.spritesheet.textures[`${Actions.STAND}_${newDirection}.png`]];
     }
   }
 
