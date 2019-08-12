@@ -12,7 +12,7 @@ const HALF_SCREEN_HEIGHT = SCREEN_HEIGHT / 2;
 const app = new Application({
   width: SCREEN_WIDTH,
   height: SCREEN_HEIGHT,
-  antialiasing: true,
+  antialias: true,
   transparent: false,
 });
 
@@ -81,7 +81,7 @@ function gameLoop(delta){
 }
 
 function play(delta) {
-  link.update(keyboard, background);
+  link.updateSprite(keyboard, background);
   updateGameScenePosition();
 }
 

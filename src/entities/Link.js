@@ -23,68 +23,73 @@ const Actions = Object.freeze({
   WALK: 'walk'
 })
 
+class Link extends AnimatedSprite {
+  constructor() {
+    const linkMovementSheet = Loader.shared.resources['assets/textures/link/LinkMovement.json'].spritesheet;
+    const standDownTexture = linkMovementSheet.textures[`${Actions.STAND}_${Directions.DOWN}.png`];
+    super([standDownTexture]);
+    // AnimatedSprite fields
+    this.animationSpeed = 1/2;
+
+    // Link fields
+    this.xSub = 0;
+    this.ySub = 0;
+    this.spritesheet = linkMovementSheet;
+    this.state = {
+      action: Actions.STAND,
+      direction: Directions.DOWN
+    };
+  }
+
+  updateSprite(keyboard, window, background) {
+    const { left, right, up, down, directionChange } = keyboard;
+    const { state } = link;
+    const vx = right.pressed ? 1 : left.pressed ? -1 : 0;
+    const vy = down.pressed ? 1 : up.pressed ? -1 : 0;
+    const moving = vx !== 0 || vy !== 0;
+    const newAction = moving ? Actions.WALK : Actions.STAND;
+    const newDirection = getNewDirection(directionChange, vx, vy, state.direction);
+    const newState = {
+      action: newAction,
+      direction: newDirection
+    };
+
+    // Reset subpixels when direction has changed
+    if (directionChange) {
+      link.xSub = 0;
+      link.ySub = 0;
+    }
+
+    // Update textures if Link has changed direction or action
+    if (hasLinkStateChanged(state, newState)) {
+      link.state = newState;
+      if (newAction === Actions.WALK) {
+        link.textures = link.spritesheet.animations[`${Actions.WALK}_${newDirection}`];
+        link.play();
+      } else if (newAction === Actions.STAND) {
+        link.textures = [link.spritesheet.textures[`${Actions.STAND}_${newDirection}.png`]];
+      }
+    }
+
+    // Only update link if he's moving
+    if (moving) {
+      const movement = vx === 0 || vy === 0 ? cardinal : diagonal;
+
+      updatePosition(link, movement, vx, vy);
+      contain(link, window);
+    }
+  }
+}
+
 let link;
 export function getLink() {
   if (link) {
     return link;
   }
-  const linkMovementSheet = Loader.shared.resources['assets/textures/link/LinkMovement.json'].spritesheet;
-  const standDownTexture = linkMovementSheet.textures[`${Actions.STAND}_${Directions.DOWN}.png`];
-
-  link = new AnimatedSprite([standDownTexture]);
-  link.animationSpeed = 1/2;
+  link = new Link();
   link.play();
 
-  // TODO: Create separate Link class that extends AnimatedSprite
-  link.xSub = 0;
-  link.ySub = 0;
-  link.update = updateLink;
-
-  link.spritesheet = linkMovementSheet;
-  link.state = {
-    action: Actions.STAND,
-    direction: Directions.DOWN
-  };
-
   return link;
-}
-
-function updateLink(keyboard, window, background) {
-  const { left, right, up, down, directionChange } = keyboard;
-  const { state } = link;
-  const vx = right.pressed ? 1 : left.pressed ? -1 : 0;
-  const vy = down.pressed ? 1 : up.pressed ? -1 : 0;
-  const moving = vx !== 0 || vy !== 0;
-  const newAction = moving ? Actions.WALK : Actions.STAND;
-  const newDirection = getNewDirection(directionChange, vx, vy, state.direction);
-  const newState = {
-    action: newAction,
-    direction: newDirection
-  };
-
-  // Reset subpixels when direction has changed
-  if (directionChange) {
-    link.xSub = 0;
-    link.ySub = 0;
-  }
-
-  // Update textures if Link has changed direction or action
-  if (hasLinkStateChanged(state, newState)) {
-    link.state = newState;
-    if (newAction === Actions.WALK) {
-      link.textures = link.spritesheet.animations[`${Actions.WALK}_${newDirection}`];
-    } else if (newAction === Actions.STAND) {
-      link.textures = [link.spritesheet.textures[`${Actions.STAND}_${newDirection}.png`]];
-    }
-  }
-
-  // Only update link if he's moving
-  if (moving) {
-    const movement = vx === 0 || vy === 0 ? cardinal : diagonal;
-
-    updatePosition(link, movement, vx, vy);
-    contain(link, window);
-  }
 }
 
 function hasLinkStateChanged(oldState, newState) {
