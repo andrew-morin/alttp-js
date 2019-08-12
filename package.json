@@ -8,6 +8,7 @@
     "build": "webpack",
     "start": "http-server ./dist -c-1",
     "start:open": "http-server ./dist -c-1 -o",
+    "start:watch": "concurrently \"npm:watch\" \"npm:start\"",
     "watch": "webpack --watch"
   },
   "author": "Andrew Morin <drewmorin@comcast.net>",
@@ -29,6 +30,7 @@
     "webpack-cli": "^3.2.1"
   },
   "dependencies": {
+    "concurrently": "^4.1.1",
     "lodash": "^4.17.11",
     "pixi.js": "^5.0.3"
   }
