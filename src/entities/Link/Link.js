@@ -1,7 +1,5 @@
-import {Loader, Rectangle, Texture, AnimatedSprite} from 'pixi.js';
-import {contain} from '../index';
-import linkTexture from '../assets/textures/link.gif';
-import linkMovementTexture from '../assets/textures/link.gif';
+import {Loader, AnimatedSprite} from 'pixi.js';
+import {contain} from '../../index';
 
 const cardinal = {
   speed: 1,

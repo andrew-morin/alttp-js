@@ -1,4 +1,5 @@
-import {Loader, Rectangle, Sprite} from 'pixi.js';
+import {Loader, Rectangle} from 'pixi.js';
+import Tile from '../Tile.js';
 import lightWorld from '../../assets/textures/light-world/light_world.png';
 
 export default function lightWorldGrass() {
@@ -7,5 +8,5 @@ export default function lightWorldGrass() {
   texture.frame = rectangle;
 
   // return new Sprite(Loader.shared.resources[lightWorldGrassSprite].texture);
-  return new Sprite(texture);
+  return new Tile(texture, 1.25, 0.8125);
 }

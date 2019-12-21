@@ -1,7 +1,7 @@
 import {Application, Container} from 'pixi.js';
 import {loadTextures} from './textures';
 import {getStartingHouse} from './rooms/light-world/StartingHouse';
-import {getLink} from './entities/Link';
+import {getLink} from './entities/Link/Link';
 
 const SCREEN_WIDTH = 256;
 const SCREEN_HEIGHT = 224;
@@ -130,9 +130,6 @@ export function contain(sprite, container) {
     collision = "bottom";
   }
   //Return the `collision` value
-  if (collision) {
-    console.log(collision);
-  }
   return collision;
 }
 
