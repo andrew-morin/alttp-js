@@ -1,6 +1,5 @@
 import {Application, Container} from 'pixi.js';
 import {loadTextures} from './textures';
-import {getStartingHouse} from './rooms/light-world/StartingHouse';
 import {getOutsideUnclesHouse} from './rooms/light-world/OutsideUnclesHouse';
 import {getLink} from './entities/Link/Link';
 
@@ -70,7 +69,7 @@ function renderRoom(room, gameScene) {
         tile.setTransform(x, y);
         gameScene.addChild(tile);
       }
-    })
+    });
   });
 }
 
@@ -81,6 +80,8 @@ function gameLoop(delta){
   resetKeyboardToggles(keyboard);
 }
 
+// delta unused but may be useful later
+// eslint-disable-next-line no-unused-vars
 function play(delta) {
   link.updateSprite(keyboard, background);
   updateGameScenePosition();
@@ -134,7 +135,8 @@ export function contain(sprite, container) {
   return collision;
 }
 
-//The `hitTestRectangle` function
+//The `hitTestRectangle` function, unused but may be useful later
+// eslint-disable-next-line no-unused-vars
 function hitTestRectangle(r1, r2) {
   //Define the variables we'll need to calculate
   let hit, combinedHalfWidths, combinedHalfHeights, vx, vy;
@@ -199,7 +201,7 @@ function createKeyboard() {
     38: 'up',
     39: 'right',
     40: 'down'
-  }
+  };
 
   function downHandler(event) {
     const key = inputs[keycodes[event.keyCode]];

@@ -4,22 +4,22 @@ import {contain} from '../../index';
 const cardinal = {
   speed: 1,
   subpixel: 0.5
-}
+};
 const diagonal = {
   speed: 1,
   subpixel: 0
-}
+};
 
 const Directions = Object.freeze({
   UP: 'up',
   DOWN: 'down',
   LEFT: 'left',
   RIGHT: 'right'
-})
+});
 const Actions = Object.freeze({
   STAND: 'stand',
   WALK: 'walk'
-})
+});
 
 class Link extends AnimatedSprite {
   constructor() {
@@ -39,7 +39,7 @@ class Link extends AnimatedSprite {
     };
   }
 
-  updateSprite(keyboard, window, background) {
+  updateSprite(keyboard, background) {
     const { left, right, up, down, directionChange } = keyboard;
     const { state } = link;
     const vx = right.pressed ? 1 : left.pressed ? -1 : 0;
@@ -74,7 +74,7 @@ class Link extends AnimatedSprite {
       const movement = vx === 0 || vy === 0 ? cardinal : diagonal;
 
       updatePosition(link, movement, vx, vy);
-      contain(link, window);
+      contain(link, background);
     }
   }
 }
@@ -101,12 +101,12 @@ function getNewDirection(directionChange, vx, vy, direction) {
         return vy === 1 ? Directions.DOWN : Directions.UP;
       case 1:
         if (shouldUpdateHorizDirection(vy, direction)) {
-          return Directions.RIGHT
+          return Directions.RIGHT;
         }
         break;
       case -1:
         if (shouldUpdateHorizDirection(vy, direction)) {
-          return Directions.LEFT
+          return Directions.LEFT;
         }
         break;
     }

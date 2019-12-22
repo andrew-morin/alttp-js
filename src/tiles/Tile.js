@@ -7,6 +7,6 @@ export default class Tile extends Sprite {
     this.linkMovement = {
       cardinal: cardinalSpeed,
       diagonal: diagonalSpeed
-    }
+    };
   }
 }
