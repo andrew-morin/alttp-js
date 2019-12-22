@@ -1,6 +1,7 @@
 import {Application, Container} from 'pixi.js';
 import {loadTextures} from './textures';
 import {getStartingHouse} from './rooms/light-world/StartingHouse';
+import {getOutsideUnclesHouse} from './rooms/light-world/OutsideUnclesHouse';
 import {getLink} from './entities/Link/Link';
 
 const SCREEN_WIDTH = 256;
@@ -31,7 +32,7 @@ function setup() {
   background = new Container();
   app.stage.addChild(gameScene);
 
-  renderRoom(getStartingHouse(), background);
+  renderRoom(getOutsideUnclesHouse(), background);
   link = getLink();
   link.x = SCREEN_WIDTH / 2;
   link.y = SCREEN_HEIGHT / 2;

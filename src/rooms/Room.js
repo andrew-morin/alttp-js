@@ -26,7 +26,7 @@ export class RoomBuilder {
   }
 
   setTile(x, y, tile) {
-    this.tileMap[x][y] = tile;
+    this.tileMap[y][x] = tile;
   }
 
   build() {
