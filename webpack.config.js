@@ -19,12 +19,12 @@ module.exports = {
     hot: true
   },
   resolve: {
-      extensions: ['.js', '.json']
+      extensions: ['.js', '.json', '.ts']
   },
   module: {
     rules: [
       {
-        test: /\.js$/,
+        test: /\.(j|t)s$/,
         exclude: /node_modules/,
         use: {
           loader: 'babel-loader'
@@ -37,7 +37,7 @@ module.exports = {
         ]
       },
       {
-        test: /\.js$/,
+        test: /\.(j|t)s$/,
         use: ["source-map-loader"],
         enforce: "pre"
       }
