@@ -1,9 +1,17 @@
-import {Application, Container, Rectangle, Sprite} from 'pixi.js';
+import {Application, Container, Rectangle, Sprite, settings, SCALE_MODES} from 'pixi.js';
 import {loadTextures} from './textures';
 import Room from './rooms/Room';
 import Tile from './tiles/Tile';
 import {getOutsideUnclesHouse} from './rooms/light-world/OutsideUnclesHouse';
 import {Link, getLink} from './entities/Link/Link';
+
+// Set margin and remove padding from document body
+const BODY_MARGIN = 8;
+document.body.style.setProperty('margin', `${BODY_MARGIN}px`);
+document.body.style.setProperty('padding', '0');
+
+// Disable interpolation when scaling
+settings.SCALE_MODE = SCALE_MODES.NEAREST;
 
 const SCREEN_WIDTH = 256;
 const SCREEN_HEIGHT = 224;
@@ -17,6 +25,10 @@ const app = new Application({
   antialias: true,
   transparent: false,
 });
+
+const SCALE = Math.min((window.innerHeight - 2 * BODY_MARGIN) / SCREEN_HEIGHT, (window.innerWidth - 2 * BODY_MARGIN) / SCREEN_WIDTH);
+app.renderer.resize(SCALE * SCREEN_WIDTH, SCALE * SCREEN_HEIGHT);
+app.stage.scale.set(SCALE);
 
 interface Input {
   pressed: boolean;

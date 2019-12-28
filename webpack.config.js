@@ -19,7 +19,7 @@ module.exports = {
     hot: true
   },
   resolve: {
-      extensions: ['.js', '.json', '.ts']
+    extensions: ['.js', '.json', '.ts']
   },
   module: {
     rules: [
