@@ -113,22 +113,21 @@ export class Link extends AnimatedSprite {
     return direction;
   }
 
-  updateSubpixel(subpixel: number, vel: number): [number, number] {
-    const update = Math.floor(subpixel);
+  updateVelocityAndSubpixel(subpixel: number, subpixelChange: number, velocity: number): [number, number] {
+    let newSubpixel = subpixel + subpixelChange;
+    const update = Math.floor(newSubpixel);
     if (update !== 0) {
-      const newSubPixel = subpixel - update;
-      return [vel + update, newSubPixel];
+      newSubpixel = subpixel - update;
+      return [velocity + update, newSubpixel];
     }
-    return [vel, subpixel];
+    return [velocity, newSubpixel];
   }
 
   updatePosition(movement: number, vx: number, vy: number): void {
     const speed = Math.floor(movement);
     const subpixel = movement % 1;
-    this.xSub += subpixel * vx;
-    this.ySub += subpixel * vy;
-    const [finalVx, xSub] = this.updateSubpixel(subpixel * vx, speed * vx);
-    const [finalVy, ySub] = this.updateSubpixel(subpixel * vy, speed * vy);
+    const [finalVx, xSub] = this.updateVelocityAndSubpixel(this.xSub, subpixel * vx, speed * vx);
+    const [finalVy, ySub] = this.updateVelocityAndSubpixel(this.ySub, subpixel * vy, speed * vy);
     this.x += finalVx;
     this.xSub = xSub;
     this.y += finalVy;

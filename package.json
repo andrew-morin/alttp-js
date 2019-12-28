@@ -6,9 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack",
-    "start": "http-server ./dist -c-1",
+    "start": "concurrently \"npm:watch\" \"http-server ./dist -c-1\"",
     "start:open": "http-server ./dist -c-1 -o",
-    "start:watch": "concurrently \"npm:watch\" \"npm:start\"",
     "watch": "webpack --watch",
     "lint": "eslint src --ext .js,.ts",
     "type-check": "tsc --noEmit",
