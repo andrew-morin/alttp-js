@@ -23,7 +23,6 @@ interface LinkState {
 }
 
 export class Link extends AnimatedSprite {
-  animationSpeed: number;
   xSub: number;
   ySub: number;
   spritesheet: Spritesheet | undefined;
