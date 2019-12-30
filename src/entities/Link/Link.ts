@@ -1,8 +1,9 @@
-import {Container, AnimatedSprite, Loader, Spritesheet} from 'pixi.js';
-import {contain, Keyboard} from '../../index';
+import {Container, AnimatedSprite, Loader, Spritesheet, TextureLoader} from 'pixi.js';
+import Tile from '../../tiles/Tile';
+import {contain, hitTestRectangle, Keyboard} from '../../index';
 
-const cardinal = 1.5;
-const diagonal = 1.0;
+const DEFAULT_CARDINAL = 1.5;
+const DEFAULT_DIAGONAL = 1.0;
 
 enum Direction {
   UP = 'up',
@@ -77,6 +78,18 @@ export class Link extends AnimatedSprite {
 
     // Only update link if he's moving
     if (moving) {
+      let cardinal = 0;// DEFAULT_CARDINAL;
+      let diagonal = 0;// DEFAULT_DIAGONAL;
+      const standingTile = background.children.find(tile => {
+        if (tile instanceof Tile) {
+          return tile.containsPoint(this.getGlobalPosition());
+          // return hitTestRectangle(tile.getBounds(), this.getBounds());
+        }
+        return false;
+      });
+      if (standingTile instanceof Tile) {
+        ({cardinal, diagonal} = standingTile.linkMovement);
+      }
       const movement = vx === 0 || vy === 0 ? cardinal : diagonal;
 
       this.updatePosition(movement, vx, vy);

@@ -223,9 +223,7 @@ export function contain(sprite: Sprite, container: Container): string | undefine
   return collision;
 }
 
-//The `hitTestRectangle` function, unused but may be useful later
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function hitTestRectangle(r1: Rectangle, r2: Rectangle): boolean {
+export function hitTestRectangle(r1: Rectangle, r2: Rectangle): boolean {
   //hit will determine whether there's a collision
   let hit = false;
   //Find the center points of each sprite

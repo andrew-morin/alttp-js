@@ -11,7 +11,7 @@ function newHouseSprite(x: number, y: number): Tile {
   const rectangle = new Rectangle(16 * x, 16 * y, 16, 16);
   texture.frame = rectangle;
 
-  return new Tile(texture, 1.25, 0.8125);
+  return new Tile(texture, 0.25, 0.15);
 }
 
 export function getOutsideUnclesHouse(): Room {
