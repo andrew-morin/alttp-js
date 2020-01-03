@@ -34,6 +34,7 @@ export class Link extends AnimatedSprite {
     super([standDownTexture]);
     // AnimatedSprite fields
     this.animationSpeed = 1/2;
+    this.updateAnchor = true;
 
     // Link fields
     this.xSub = 0;
