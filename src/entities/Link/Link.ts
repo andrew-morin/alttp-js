@@ -1,9 +1,6 @@
-import {Container, AnimatedSprite, Loader, Spritesheet, TextureLoader} from 'pixi.js';
+import {Container, AnimatedSprite, Loader, Spritesheet} from 'pixi.js';
 import Tile from '../../tiles/Tile';
-import {contain, hitTestRectangle, Keyboard} from '../../index';
-
-const DEFAULT_CARDINAL = 1.5;
-const DEFAULT_DIAGONAL = 1.0;
+import {Keyboard} from '../../index';
 
 enum Direction {
   UP = 'up',
@@ -78,12 +75,11 @@ export class Link extends AnimatedSprite {
 
     // Only update link if he's moving
     if (moving) {
-      let cardinal = 0;// DEFAULT_CARDINAL;
-      let diagonal = 0;// DEFAULT_DIAGONAL;
+      let cardinal = 0;
+      let diagonal = 0;
       const standingTile = background.children.find(tile => {
         if (tile instanceof Tile) {
           return tile.containsPoint(this.getGlobalPosition());
-          // return hitTestRectangle(tile.getBounds(), this.getBounds());
         }
         return false;
       });
@@ -92,8 +88,8 @@ export class Link extends AnimatedSprite {
       }
       const movement = vx === 0 || vy === 0 ? cardinal : diagonal;
 
-      this.updatePosition(movement, vx, vy);
-      contain(this, background);
+      this.updatePosition(movement, vx, vy, background);
+      this.contain(background);
     }
   }
 
@@ -136,15 +132,72 @@ export class Link extends AnimatedSprite {
     return [velocity, newSubpixel];
   }
 
-  updatePosition(movement: number, vx: number, vy: number): void {
+  updatePosition(movement: number, vx: number, vy: number, background: Container): void {
     const speed = Math.floor(movement);
     const subpixel = movement % 1;
     const [finalVx, xSub] = this.updateVelocityAndSubpixel(this.xSub, subpixel * vx, speed * vx);
     const [finalVy, ySub] = this.updateVelocityAndSubpixel(this.ySub, subpixel * vy, speed * vy);
-    this.x += finalVx;
+    const [newX, newY] = this.detectCollisions(finalVx, finalVy, background);
+    this.x = newX;
     this.xSub = xSub;
-    this.y += finalVy;
+    this.y = newY;
     this.ySub = ySub;
+  }
+
+  detectCollisions(vx: number, vy: number, background: Container): [number, number] {
+    let newX = this.x + vx, newY = this.y + vy;
+    let xPointsToCheck: [number, number][] | undefined;
+    if (vx > 0) {
+      xPointsToCheck = [[newX + 8, this.y + 8], [newX + 8, this.y], [newX + 8, this.y - 8]];
+    } else if (vx < 0) {
+      xPointsToCheck = [[newX - 8, this.y + 8], [newX - 8, this.y], [newX - 8, this.y - 8]];
+    }
+    if (xPointsToCheck) {
+      const collidedTile = this.detectCollisionHelper(xPointsToCheck, background);
+      if (collidedTile) {
+        const unitVelocity = vx / Math.abs(vx);
+        const centerOfTile = collidedTile.x + 8;
+        newX = centerOfTile + (-unitVelocity * 16);
+      }
+    }
+    let yPointsToCheck: [number, number][] | undefined;
+    if (vy > 0) {
+      yPointsToCheck = [[this.x + 8, newY + 8], [this.x, newY + 8], [this.x - 8, newY + 8]];
+    } else if (vy < 0) {
+      yPointsToCheck = [[this.x + 8, newY - 8], [this.x, newY - 8], [this.x - 8, newY - 8]];
+    }
+    if (yPointsToCheck) {
+      const collidedTile = this.detectCollisionHelper(yPointsToCheck, background);
+      if (collidedTile) {
+        const unitVelocity = vy / Math.abs(vy);
+        const centerOfTile = collidedTile.y + 8;
+        newY = centerOfTile + (-unitVelocity * 16);
+      }
+    }
+
+    return [newX, newY];
+  }
+
+  detectCollisionHelper(pointsToCheck: [number, number][], background: Container): Tile | undefined {
+    return background.children.find(child => {
+      const tile = child as Tile;
+      return pointsToCheck.some(point => tile.collidesWithPoint(...point));
+    }) as Tile;
+  }
+
+  contain(background: Container): void {
+    if (this.x < 8) {
+      this.x = 8;
+    }
+    if (this.y < 8) {
+      this.y = 8;
+    }
+    if (this.x > background.width - 9) {
+      this.x = background.width - 9;
+    }
+    if (this.y > background.height - 9) {
+      this.y = background.height - 9;
+    }
   }
 }
 

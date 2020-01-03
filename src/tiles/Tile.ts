@@ -42,7 +42,7 @@ export default class Tile extends Sprite {
     if (this.collisionShape) {
       const localX = x - this.x;
       const localY = y - this.y;
-      return this.collisionShape.contains(localX, localY);
+      return localX > 0 && localY > 0 && this.collisionShape.contains(localX, localY);
     }
 
     return false;

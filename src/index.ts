@@ -9,6 +9,7 @@ import {Link, getLink} from './entities/Link/Link';
 const BODY_MARGIN = 8;
 document.body.style.setProperty('margin', `${BODY_MARGIN}px`);
 document.body.style.setProperty('padding', '0');
+document.body.style.setProperty('height', 'calc(100vh - 16px)');
 
 // Disable interpolation when scaling
 settings.SCALE_MODE = SCALE_MODES.NEAREST;
@@ -26,7 +27,7 @@ const app = new Application({
   transparent: false,
 });
 
-const SCALE = Math.min((window.innerHeight - 2 * BODY_MARGIN) / SCREEN_HEIGHT, (window.innerWidth - 2 * BODY_MARGIN) / SCREEN_WIDTH);
+const SCALE = Math.floor(Math.min((window.innerHeight - 2 * BODY_MARGIN) / SCREEN_HEIGHT, (window.innerWidth - 2 * BODY_MARGIN) / SCREEN_WIDTH));
 app.renderer.resize(SCALE * SCREEN_WIDTH, SCALE * SCREEN_HEIGHT);
 app.stage.scale.set(SCALE);
 
