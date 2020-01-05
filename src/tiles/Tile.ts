@@ -49,4 +49,7 @@ export default class Tile extends Sprite {
 
     return false;
   }
+
+  updateOnOverlap(): void {}
+  updateOnCollision(): void {}
 }

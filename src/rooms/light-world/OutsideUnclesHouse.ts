@@ -3,7 +3,7 @@ import Room, { RoomBuilder } from '../Room';
 import Tile from '../../tiles/Tile';
 import lightWorldField from '../../tiles/light-world/LightWorldField';
 import houseSprite from '../../assets/textures/uncle-house-outside/house.png';
-import { doorLeftSide, doorRightSide } from '../../tiles/light-world/DoorTiles';
+import doorTiles from '../../tiles/light-world/DoorTiles';
 
 let OutsideUnclesHouse: Room;
 
@@ -21,15 +21,22 @@ function newHouseSprite(x: number, y: number, solid = false): Tile {
 export function getOutsideUnclesHouse(): Room {
   if (!OutsideUnclesHouse) {
     const builder = new RoomBuilder(20, 20, lightWorldField);
+    const [doorLeftTile, doorRightTile, aboveDoorLeftTile, aboveDoorRightTile] = doorTiles();
     for (let i = 0; i <= 6; i++) {
       for (let j = 0; j <= 5; j++) {
         let tile;
         // Door
         if (j === 5) {
           if (i === 2) {
-            tile = doorLeftSide();
+            tile = doorLeftTile;
           } else if (i === 3) {
-            tile = doorRightSide();
+            tile = doorRightTile;
+          }
+        } else if (j === 4) {
+          if (i === 2) {
+            tile = aboveDoorLeftTile;
+          } else if (i === 3) {
+            tile = aboveDoorRightTile;
           }
         }
         tile = tile || newHouseSprite(i, j, i !== 6);

@@ -1,4 +1,4 @@
-import {AnimatedSprite, Container, DisplayObject, Loader, Spritesheet, Rectangle} from 'pixi.js';
+import {AnimatedSprite, Container, DisplayObject, Loader, Point, Rectangle, Spritesheet} from 'pixi.js';
 import Tile from '../../tiles/Tile';
 import {Keyboard} from '../../index';
 
@@ -224,8 +224,11 @@ export class Link extends AnimatedSprite {
       }
       pointsToCheck.forEach((point, index) => {
         if (tile.collidesWithPoint(...point)) {
+          tile.updateOnCollision();
           collidedPoints[index] = true;
           collidedTile = tile;
+        } else if (tile.containsPoint(new Point(...point))) {
+          tile.updateOnOverlap();
         }
       });
     });

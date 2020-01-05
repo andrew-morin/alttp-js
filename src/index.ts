@@ -172,15 +172,6 @@ function setup(): void {
   link.y = SCREEN_HEIGHT / 2;
   gameScene.addChild(background, link);
 
-  //Make the sprites and add them to the `gameScene`
-  //Create an alias for the texture atlas frame ids
-  /* Example
-  id = resources['images/treasureHunter.json'].textures;
-  //Dungeon
-  dungeon = new Sprite(id['dungeon.png']);
-  gameScene.addChild(dungeon);
-  */
-
   //Create the `gameOver` scene
   gameOverScene = new Container();
   app.stage.addChild(gameOverScene);
@@ -194,74 +185,20 @@ function setup(): void {
   app.ticker.add((delta: number) => gameLoop(delta));
 }
 
-/* Helper functions */
-export function contain(sprite: Sprite, container: Container): string | undefined {
-  const localBounds = sprite.getLocalBounds();
-  const x = sprite.x + localBounds.x;
-  const y = sprite.y + localBounds.y;
-  let collision = undefined;
-  //Left
-  if (x < container.x) {
-    sprite.x = container.x + sprite.anchor.x * sprite.width;
-    collision = 'left';
-  }
-  //Top
-  if (y < container.y) {
-    sprite.y = container.y + sprite.anchor.y * sprite.height;
-    collision = 'top';
-  }
-  //Right
-  if (x + sprite.width > container.width) {
-    sprite.x = container.x + container.width - sprite.width + sprite.anchor.x * sprite.width;
-    collision = 'right';
-  }
-  //Bottom
-  if (y + sprite.height > container.height) {
-    sprite.y = container.y + container.height - sprite.height + sprite.anchor.y * sprite.height;
-    collision = 'bottom';
-  }
-  //Return the `collision` value
-  return collision;
-}
-
-export function hitTestRectangle(r1: Rectangle, r2: Rectangle): boolean {
-  //hit will determine whether there's a collision
-  let hit = false;
-  //Find the center points of each sprite
-  const r1centerX = r1.x + r1.width / 2;
-  const r1centerY = r1.y + r1.height / 2;
-  const r2centerX = r2.x + r2.width / 2;
-  const r2centerY = r2.y + r2.height / 2;
-  //Find the half-widths and half-heights of each sprite
-  const r1halfWidth = r1.width / 2;
-  const r1halfHeight = r1.height / 2;
-  const r2halfWidth = r2.width / 2;
-  const r2halfHeight = r2.height / 2;
-  //Calculate the distance vector between the sprites
-  const vx = r1centerX - r2centerX;
-  const vy = r1centerY - r2centerY;
-  //Figure out the combined half-widths and half-heights
-  const combinedHalfWidths = r1halfWidth + r2halfWidth;
-  const combinedHalfHeights = r1halfHeight + r2halfHeight;
-  //Check for a collision on the x axis
-  if (Math.abs(vx) < combinedHalfWidths) {
-    //A collision might be occuring. Check for a collision on the y axis
-    if (Math.abs(vy) < combinedHalfHeights) {
-      //There's definitely a collision happening
-      hit = true;
-    } else {
-      //There's no collision on the y axis
-      hit = false;
-    }
-  } else {
-    //There's no collision on the x axis
-    hit = false;
-  }
-  //`hit` will be either `true` or `false`
-  return hit;
-}
-
 //Add the canvas that Pixi automatically created for you to the HTML document
 document.body.appendChild(app.view);
+
+const stopButton = document.createElement('button');
+stopButton.innerText = 'Stop';
+stopButton.addEventListener('click', () => {
+  if (app.ticker.started) {
+    app.ticker.stop();
+    stopButton.innerText = 'Start';
+  } else {
+    app.ticker.start();
+    stopButton.innerText = 'Stop';
+  }
+});
+document.body.appendChild(stopButton);
 
 loadTextures(setup);

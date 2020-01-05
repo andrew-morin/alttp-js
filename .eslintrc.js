@@ -25,6 +25,8 @@ module.exports = {
     'comma-dangle': ['warn', 'only-multiline'],
     'eol-last': ['error', 'always'],
     indent: ['error', 2, { SwitchCase: 1, VariableDeclarator: 2 }],
+    'no-empty-function': 'off',
+    '@typescript-eslint/no-empty-function': ['error', { "allow": ["methods"] }],
     'no-implicit-globals': 'error',
     quotes: ['error', 'single', { allowTemplateLiterals: true }],
     semi: 'error'
