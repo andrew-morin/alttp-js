@@ -1,4 +1,4 @@
-import {Polygon, Rectangle, Sprite, Texture} from 'pixi.js';
+import {Rectangle, Sprite, Texture} from 'pixi.js';
 
 interface TileLinkMovement {
   cardinal: number;
@@ -19,11 +19,11 @@ const SOLID_COLLISION_SHAPE = new Rectangle(0, 0, 16, 16);
 
 export default class Tile extends Sprite {
   linkMovement: TileLinkMovement;
-  collisionShape: Polygon | Rectangle | undefined;
+  collisionShape: Rectangle | undefined;
 
   constructor(texture: Texture, solid: boolean)
-  constructor(texture: Texture, cardinalSpeed: number, diagonalSpeed: number, collisionShape?: Polygon | Rectangle)
-  constructor(texture: Texture, cardinalSpeedOrSolid: number | boolean, diagonalSpeed = 0, collisionShape?: Polygon | Rectangle) {
+  constructor(texture: Texture, cardinalSpeed: number, diagonalSpeed: number, collisionShape?: Rectangle)
+  constructor(texture: Texture, cardinalSpeedOrSolid: number | boolean, diagonalSpeed = 0, collisionShape?: Rectangle) {
     super(texture);
 
     if (typeof cardinalSpeedOrSolid === 'boolean') {
@@ -42,7 +42,9 @@ export default class Tile extends Sprite {
     if (this.collisionShape) {
       const localX = x - this.x;
       const localY = y - this.y;
-      return localX > 0 && localY > 0 && this.collisionShape.contains(localX, localY);
+      if (this.collisionShape) {
+        return this.collisionShape.contains(localX, localY);
+      }
     }
 
     return false;

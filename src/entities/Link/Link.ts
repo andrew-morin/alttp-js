@@ -1,4 +1,4 @@
-import {Container, AnimatedSprite, Loader, Spritesheet} from 'pixi.js';
+import {AnimatedSprite, Container, DisplayObject, Loader, Spritesheet, Rectangle} from 'pixi.js';
 import Tile from '../../tiles/Tile';
 import {Keyboard} from '../../index';
 
@@ -145,44 +145,91 @@ export class Link extends AnimatedSprite {
   }
 
   detectCollisions(vx: number, vy: number, background: Container): [number, number] {
+    const linkRow = Math.floor(this.y / 16);
+    const rowsToCheck = [linkRow - 1, linkRow, linkRow + 1];
+    const linkCol = Math.floor(this.x / 16);
+    const colsToCheck = [linkCol - 1, linkCol, linkCol + 1];
+    const tilesPerRow = Math.floor(background.width / 16);
+    const tilesToCheck: DisplayObject[] = [];
+    rowsToCheck.forEach(row => {
+      colsToCheck.forEach(col => {
+        const index = row * tilesPerRow + col;
+        if (index >= 0 && index < background.children.length) {
+          tilesToCheck.push(background.getChildAt(index));
+        }
+      });
+    });
     let newX = this.x + vx, newY = this.y + vy;
     let xPointsToCheck: [number, number][] | undefined;
     if (vx > 0) {
-      xPointsToCheck = [[newX + 8, this.y + 8], [newX + 8, this.y], [newX + 8, this.y - 8]];
+      xPointsToCheck = [[newX + 8, this.y + 7], [newX + 8, this.y], [newX + 8, this.y - 8]];
     } else if (vx < 0) {
-      xPointsToCheck = [[newX - 8, this.y + 8], [newX - 8, this.y], [newX - 8, this.y - 8]];
+      xPointsToCheck = [[newX - 8, this.y + 7], [newX - 8, this.y], [newX - 8, this.y - 8]];
     }
     if (xPointsToCheck) {
-      const collidedTile = this.detectCollisionHelper(xPointsToCheck, background);
+      const [collidedTile, collidedPoints] = this.detectCollisionHelper(xPointsToCheck, tilesToCheck);
       if (collidedTile) {
         const unitVelocity = vx / Math.abs(vx);
-        const centerOfTile = collidedTile.x + 8;
-        newX = centerOfTile + (-unitVelocity * 16);
+        const collisionShape = collidedTile.collisionShape as Rectangle;
+        const halfWidth = collisionShape.width / 2;
+        const centerOfTile = collidedTile.x + collisionShape.x + halfWidth;
+        newX = centerOfTile + (-unitVelocity * (halfWidth + 8));
+      }
+
+
+      if (vy === 0 && !collidedPoints[1]) {
+        if (collidedPoints[0]) {
+          newY -= 1;
+        } else if (collidedPoints[2]) {
+          newY += 1;
+        }
       }
     }
     let yPointsToCheck: [number, number][] | undefined;
     if (vy > 0) {
-      yPointsToCheck = [[this.x + 8, newY + 8], [this.x, newY + 8], [this.x - 8, newY + 8]];
+      yPointsToCheck = [[newX + 7, newY + 8], [newX, newY + 8], [newX - 8, newY + 8]];
     } else if (vy < 0) {
-      yPointsToCheck = [[this.x + 8, newY - 8], [this.x, newY - 8], [this.x - 8, newY - 8]];
+      yPointsToCheck = [[newX + 7, newY - 8], [newX, newY - 8], [newX - 8, newY - 8]];
     }
     if (yPointsToCheck) {
-      const collidedTile = this.detectCollisionHelper(yPointsToCheck, background);
+      const [collidedTile, collidedPoints] = this.detectCollisionHelper(yPointsToCheck, tilesToCheck);
       if (collidedTile) {
         const unitVelocity = vy / Math.abs(vy);
-        const centerOfTile = collidedTile.y + 8;
-        newY = centerOfTile + (-unitVelocity * 16);
+        const collisionShape = collidedTile.collisionShape as Rectangle;
+        const halfHeight = collisionShape.height / 2;
+        const centerOfTile = collidedTile.y + collisionShape.y + halfHeight;
+        newY = centerOfTile + (-unitVelocity * (halfHeight + 8));
+
+
+        if (vx === 0 && !collidedPoints[1]) {
+          if (collidedPoints[0]) {
+            newX -= 1;
+          } else if (collidedPoints[2]) {
+            newX += 1;
+          }
+        }
       }
     }
 
     return [newX, newY];
   }
 
-  detectCollisionHelper(pointsToCheck: [number, number][], background: Container): Tile | undefined {
-    return background.children.find(child => {
+  detectCollisionHelper(pointsToCheck: [number, number][], tilesToCheck: DisplayObject[]): [Tile | undefined, boolean[]] {
+    const collidedPoints = new Array(pointsToCheck.length).fill(false);
+    let collidedTile;
+    tilesToCheck.forEach(child => {
       const tile = child as Tile;
-      return pointsToCheck.some(point => tile.collidesWithPoint(...point));
-    }) as Tile;
+      if (tile.x > this.x + 9 || tile.x < this.x - 25 || tile.y > this.y + 9 || tile.y < this.y - 25) {
+        return;
+      }
+      pointsToCheck.forEach((point, index) => {
+        if (tile.collidesWithPoint(...point)) {
+          collidedPoints[index] = true;
+          collidedTile = tile;
+        }
+      });
+    });
+    return [collidedTile, collidedPoints];
   }
 
   contain(background: Container): void {
