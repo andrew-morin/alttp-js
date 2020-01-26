@@ -1,8 +1,9 @@
-import {Application, Container, Rectangle, Sprite, settings, SCALE_MODES} from 'pixi.js';
+import {Application, Container, Graphics, settings, SCALE_MODES} from 'pixi.js';
 import {loadTextures} from './textures';
 import Room from './rooms/Room';
 import Tile from './tiles/Tile';
 import {getOutsideUnclesHouse} from './rooms/light-world/OutsideUnclesHouse';
+import {getInsideUnclesHouse} from './rooms/light-world/InsideUnclesHouse';
 import {Link, getLink} from './entities/Link/Link';
 
 // Set margin and remove padding from document body
@@ -147,17 +148,88 @@ function createKeyboard(): Keyboard {
   return inputs;
 }
 
-function renderRoom(room: Room, gameScene: Container): void {
+function renderRoom(room: Room): void {
   room.tileMap.forEach((row: Tile[], rowIndex: number) => {
     const y = rowIndex * 16;
     row.forEach((tile: Tile, tileIndex: number) => {
       if (tile) {
         const x = tileIndex * 16;
         tile.setTransform(x, y);
-        gameScene.addChild(tile);
+        background.addChild(tile);
       }
     });
   });
+}
+
+let doorTransitionId = null;
+let transitionCounter = 0;
+const DOOR_TRANSITION_END = 45;
+let transitionGraphics: Graphics;
+
+// delta unused but may be useful later
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function doorTransitionEndState(delta: number): void {
+  transitionGraphics.clear();
+
+  if (transitionCounter >= DOOR_TRANSITION_END) {
+    state = play;
+    transitionCounter = 0;
+    return;
+  }
+
+  transitionGraphics.beginFill(0x000000);
+  transitionGraphics.drawRect(-SCREEN_WIDTH, -SCREEN_HEIGHT, 3 * SCREEN_WIDTH, 3 * SCREEN_HEIGHT);
+  transitionGraphics.beginHole();
+  const width = SCREEN_WIDTH * transitionCounter / DOOR_TRANSITION_END + 1;
+  const height = 1/2 * SCREEN_HEIGHT * transitionCounter / DOOR_TRANSITION_END + 1;
+  transitionGraphics.drawEllipse(link.x, link.y, width, height);
+  transitionGraphics.endHole();
+  transitionGraphics.endFill();
+
+  transitionCounter++;
+}
+
+// delta unused but may be useful later
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function doorTransitionMidState(delta: number): void {
+  if (transitionCounter > DOOR_TRANSITION_END) {
+    state = doorTransitionEndState;
+    transitionCounter = 0;
+    background.removeChildren();
+    renderRoom(getInsideUnclesHouse());
+    return;
+  }
+
+  transitionCounter++;
+}
+
+// delta unused but may be useful later
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function doorTransitionStartState(delta: number): void {
+  transitionGraphics.clear();
+  transitionGraphics.beginFill(0x000000);
+  transitionGraphics.drawRect(-SCREEN_WIDTH, -SCREEN_HEIGHT, 3 * SCREEN_WIDTH, 3 * SCREEN_HEIGHT);
+
+  if (transitionCounter >= DOOR_TRANSITION_END) {
+    transitionGraphics.endFill();
+    state = doorTransitionMidState;
+    transitionCounter = 0;
+    return;
+  }
+
+  transitionGraphics.beginHole();
+  const width = SCREEN_WIDTH - SCREEN_WIDTH * transitionCounter / DOOR_TRANSITION_END;
+  const height = 1/2 * SCREEN_HEIGHT - 1/2 * SCREEN_HEIGHT * transitionCounter / DOOR_TRANSITION_END;
+  transitionGraphics.drawEllipse(link.x, link.y, width, height);
+  transitionGraphics.endHole();
+  transitionGraphics.endFill();
+
+  transitionCounter++;
+}
+
+function startDoorTransition(id: number): void {
+  doorTransitionId = id;
+  state = doorTransitionStartState;
 }
 
 function setup(): void {
@@ -166,8 +238,8 @@ function setup(): void {
   background = new Container();
   app.stage.addChild(gameScene);
 
-  renderRoom(getOutsideUnclesHouse(), background);
-  link = getLink();
+  renderRoom(getOutsideUnclesHouse());
+  link = getLink(startDoorTransition);
   link.x = SCREEN_WIDTH / 2;
   link.y = SCREEN_HEIGHT / 2;
   gameScene.addChild(background, link);
@@ -178,6 +250,9 @@ function setup(): void {
 
   //Make the `gameOver` scene invisible when the game first starts
   gameOverScene.visible = false;
+
+  transitionGraphics = new Graphics();
+  app.stage.addChild(transitionGraphics);
 
   keyboard = createKeyboard();
   state = play;

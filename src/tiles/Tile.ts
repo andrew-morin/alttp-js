@@ -20,6 +20,10 @@ const SOLID_COLLISION_SHAPE = new Rectangle(0, 0, 16, 16);
 export default class Tile extends Sprite {
   linkMovement: TileLinkMovement;
   collisionShape: Rectangle | undefined;
+  /* eslint-disable @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars */
+  updateOnOverlap: () => void = () => {}
+  updateOnCollision: (startDoorTransition: Function) => void = _ => {}
+  /* eslint-enable @typescript-eslint/no-empty-function */
 
   constructor(texture: Texture, solid: boolean)
   constructor(texture: Texture, cardinalSpeed: number, diagonalSpeed: number, collisionShape?: Rectangle)
@@ -49,7 +53,4 @@ export default class Tile extends Sprite {
 
     return false;
   }
-
-  updateOnOverlap(): void {}
-  updateOnCollision(): void {}
 }

@@ -33,5 +33,12 @@ export default function doorTiles(): [Tile, Tile, Tile, Tile] {
   const aboveDoorLeftTile = aboveDoorTile(doorAboveLeftImage);
   const aboveDoorRightTile = aboveDoorTile(doorAboveRightImage);
 
+  const updateOnCollision = function(startDoorTransition: Function): void {
+    startDoorTransition();
+  };
+
+  aboveDoorLeftTile.updateOnCollision = updateOnCollision;
+  aboveDoorRightTile.updateOnCollision = updateOnCollision;
+
   return [doorLeftTile, doorRightTile, aboveDoorLeftTile, aboveDoorRightTile];
 }

@@ -20,15 +20,18 @@ interface LinkState {
 }
 
 export class Link extends AnimatedSprite {
+  startDoorTransition: Function;
   xSub: number;
   ySub: number;
   spritesheet: Spritesheet | undefined;
   state: LinkState;
 
-  constructor() {
+  constructor(startDoorTransition: Function) {
     const linkMovementSheet = Loader.shared.resources['assets/textures/link/LinkMovement.json'].spritesheet;
     const standDownTexture = linkMovementSheet?.textures[`${Action.STAND}_${Direction.DOWN}.png`];
     super([standDownTexture]);
+    this.startDoorTransition = startDoorTransition;
+
     // AnimatedSprite fields
     this.animationSpeed = 1/2;
     this.updateAnchor = true;
@@ -224,7 +227,7 @@ export class Link extends AnimatedSprite {
       }
       pointsToCheck.forEach((point, index) => {
         if (tile.collidesWithPoint(...point)) {
-          tile.updateOnCollision();
+          tile.updateOnCollision(this.startDoorTransition);
           collidedPoints[index] = true;
           collidedTile = tile;
         } else if (tile.containsPoint(new Point(...point))) {
@@ -252,11 +255,11 @@ export class Link extends AnimatedSprite {
 }
 
 let link: Link;
-export function getLink(): Link {
+export function getLink(startDoorTransition: Function): Link {
   if (link) {
     return link;
   }
-  link = new Link();
+  link = new Link(startDoorTransition);
   link.play();
 
   return link;
