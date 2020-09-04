@@ -1,5 +1,5 @@
 import {Loader, Rectangle} from 'pixi.js';
-import Room, { RoomBuilder } from '../Room';
+import Room, { RoomBuilder, RoomLoader } from '../Room';
 import Tile from '../../tiles/Tile';
 import houseSprite from '../../assets/textures/inside_uncles_house.png';
 import backgroundColorTile from '../../tiles/BackgroundColorTile';
@@ -17,7 +17,7 @@ function newHouseSprite(x: number, y: number, solid = false): Tile {
   return new Tile(texture, 1.5, 1);
 }
 
-export function getInsideUnclesHouse(): Room {
+export const getInsideUnclesHouse: RoomLoader = () => {
   if (!OutsideUnclesHouse) {
     const builder = new RoomBuilder(20, 20, () => backgroundColorTile(0x3D2829));
     for (let i = 0; i <= 14; i++) {
@@ -29,4 +29,4 @@ export function getInsideUnclesHouse(): Room {
     OutsideUnclesHouse = builder.build();
   }
   return OutsideUnclesHouse;
-}
+};

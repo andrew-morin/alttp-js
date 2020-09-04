@@ -1,5 +1,6 @@
 import {Loader, Rectangle} from 'pixi.js';
 import Tile from '../Tile';
+import { RoomLoader } from '../../rooms/Room';
 import doorLeftImage from '../../assets/textures/house/door_left.png';
 import doorLeftOpenImage from '../../assets/textures/house/door_left_open.png';
 import doorAboveLeftImage from '../../assets/textures/house/door_above_left.png';
@@ -15,7 +16,7 @@ function aboveDoorTile(image: string): Tile {
   return new Tile(Loader.shared.resources[image].texture, true);
 }
 
-export default function doorTiles(): [Tile, Tile, Tile, Tile] {
+export default function doorTiles(loadNextRoom: RoomLoader): [Tile, Tile, Tile, Tile] {
   const doorLeftTile = doorTile(doorLeftImage, new Rectangle(0, 0, 8, 16));
   const doorRightTile = doorTile(doorRightImage, new Rectangle(8, 0, 8, 16));
   let open = false;
@@ -34,7 +35,7 @@ export default function doorTiles(): [Tile, Tile, Tile, Tile] {
   const aboveDoorRightTile = aboveDoorTile(doorAboveRightImage);
 
   const updateOnCollision = function(startDoorTransition: Function): void {
-    startDoorTransition();
+    startDoorTransition(loadNextRoom);
   };
 
   aboveDoorLeftTile.updateOnCollision = updateOnCollision;

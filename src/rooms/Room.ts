@@ -1,5 +1,7 @@
 import Tile from '../tiles/Tile';
 
+export type RoomLoader = () => Room;
+
 export default class Room {
   tileMap: Tile[][];
   width: number;

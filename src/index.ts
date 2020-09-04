@@ -1,9 +1,8 @@
 import {Application, Container, Graphics, settings, SCALE_MODES} from 'pixi.js';
 import {loadTextures} from './textures';
-import Room from './rooms/Room';
+import Room, { RoomLoader } from './rooms/Room';
 import Tile from './tiles/Tile';
 import {getOutsideUnclesHouse} from './rooms/light-world/OutsideUnclesHouse';
-import {getInsideUnclesHouse} from './rooms/light-world/InsideUnclesHouse';
 import {Link, getLink} from './entities/Link/Link';
 
 // Set margin and remove padding from document body
@@ -161,7 +160,7 @@ function renderRoom(room: Room): void {
   });
 }
 
-let doorTransitionId = null;
+let transitionRoomLoader: RoomLoader;
 let transitionCounter = 0;
 const DOOR_TRANSITION_END = 45;
 let transitionGraphics: Graphics;
@@ -196,7 +195,7 @@ function doorTransitionMidState(delta: number): void {
     state = doorTransitionEndState;
     transitionCounter = 0;
     background.removeChildren();
-    renderRoom(getInsideUnclesHouse());
+    renderRoom(transitionRoomLoader());
     return;
   }
 
@@ -227,8 +226,8 @@ function doorTransitionStartState(delta: number): void {
   transitionCounter++;
 }
 
-function startDoorTransition(id: number): void {
-  doorTransitionId = id;
+function startDoorTransition(loadRoom: RoomLoader): void {
+  transitionRoomLoader = loadRoom;
   state = doorTransitionStartState;
 }
 
