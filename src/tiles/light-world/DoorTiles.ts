@@ -1,45 +1,44 @@
 import {Loader, Rectangle} from 'pixi.js';
 import Tile from '../Tile';
 import { RoomLoader } from '../../rooms/Room';
-import doorLeftImage from '../../assets/textures/house/door_left.png';
-import doorLeftOpenImage from '../../assets/textures/house/door_left_open.png';
-import doorAboveLeftImage from '../../assets/textures/house/door_above_left.png';
-import doorRightImage from '../../assets/textures/house/door_right.png';
-import doorRightOpenImage from '../../assets/textures/house/door_right_open.png';
-import doorAboveRightImage from '../../assets/textures/house/door_above_right.png';
 
-function doorTile(image: string, collisionRect: Rectangle): Tile {
+function doorTile(image: string, collisionRect?: Rectangle): Tile {
+  if (collisionRect === undefined) {
+    return new Tile(Loader.shared.resources[image].texture, true);
+  }
   return new Tile(Loader.shared.resources[image].texture, 1.5, 1, collisionRect);
 }
 
-function aboveDoorTile(image: string): Tile {
-  return new Tile(Loader.shared.resources[image].texture, true);
-}
+export default function doorTiles(
+  loadNextRoom: RoomLoader,
+  insideDoorImages: string[],
+  startDoorImages: string[],
+  openDoorImages?: string[]
+): [Tile, Tile, Tile, Tile] {
+  const firstInsideDoorTile = doorTile(insideDoorImages[0]);
+  const seconeInsideDoorTile = doorTile(insideDoorImages[1]);
+  const firstDoorTile = doorTile(startDoorImages[0], new Rectangle(0, 0, 8, 16));
+  const secondDoorTile = doorTile(startDoorImages[1], new Rectangle(8, 0, 8, 16));
+  if (openDoorImages) {
+    let open = false;
+    const updateOnOverlap = function(localX: number, localY: number): void {
+      if (!open && localX <=0 || localX >= 15) {
+        open = true;
+        firstDoorTile.texture = Loader.shared.resources[openDoorImages[0]].texture;
+        secondDoorTile.texture = Loader.shared.resources[openDoorImages[1]].texture;
+      }
+    };
 
-export default function doorTiles(loadNextRoom: RoomLoader): [Tile, Tile, Tile, Tile] {
-  const doorLeftTile = doorTile(doorLeftImage, new Rectangle(0, 0, 8, 16));
-  const doorRightTile = doorTile(doorRightImage, new Rectangle(8, 0, 8, 16));
-  let open = false;
-  const updateOnOverlap = function(): void {
-    if (!open) {
-      open = true;
-      doorLeftTile.texture = Loader.shared.resources[doorLeftOpenImage].texture;
-      doorRightTile.texture = Loader.shared.resources[doorRightOpenImage].texture;
-    }
-  };
-
-  doorLeftTile.updateOnOverlap = updateOnOverlap;
-  doorRightTile.updateOnOverlap = updateOnOverlap;
-
-  const aboveDoorLeftTile = aboveDoorTile(doorAboveLeftImage);
-  const aboveDoorRightTile = aboveDoorTile(doorAboveRightImage);
+    firstDoorTile.updateOnOverlap = updateOnOverlap;
+    secondDoorTile.updateOnOverlap = updateOnOverlap;
+  }
 
   const updateOnCollision = function(startDoorTransition: Function): void {
     startDoorTransition(loadNextRoom);
   };
 
-  aboveDoorLeftTile.updateOnCollision = updateOnCollision;
-  aboveDoorRightTile.updateOnCollision = updateOnCollision;
+  firstInsideDoorTile.updateOnCollision = updateOnCollision;
+  seconeInsideDoorTile.updateOnCollision = updateOnCollision;
 
-  return [doorLeftTile, doorRightTile, aboveDoorLeftTile, aboveDoorRightTile];
+  return [firstDoorTile, secondDoorTile, firstInsideDoorTile, seconeInsideDoorTile];
 }

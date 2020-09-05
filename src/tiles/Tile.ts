@@ -21,7 +21,7 @@ export default class Tile extends Sprite {
   linkMovement: TileLinkMovement;
   collisionShape: Rectangle | undefined;
   /* eslint-disable @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars */
-  updateOnOverlap: () => void = () => {}
+  updateOnOverlap: (localX: number, localY: number) => void = () => {}
   updateOnCollision: (startDoorTransition: Function) => void = _ => {}
   /* eslint-enable @typescript-eslint/no-empty-function */
 
@@ -42,13 +42,9 @@ export default class Tile extends Sprite {
     }
   }
 
-  collidesWithPoint(x: number, y: number): boolean {
+  collidesWithPoint(localX: number, localY: number): boolean {
     if (this.collisionShape) {
-      const localX = x - this.x;
-      const localY = y - this.y;
-      if (this.collisionShape) {
-        return this.collisionShape.contains(localX, localY);
-      }
+      return this.collisionShape.contains(localX, localY);
     }
 
     return false;

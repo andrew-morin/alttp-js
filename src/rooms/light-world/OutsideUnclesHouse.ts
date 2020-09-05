@@ -5,6 +5,12 @@ import lightWorldField from '../../tiles/light-world/LightWorldField';
 import houseSprite from '../../assets/textures/uncle-house-outside/house.png';
 import doorTiles from '../../tiles/light-world/DoorTiles';
 import { getInsideUnclesHouse } from './InsideUnclesHouse';
+import doorBottomLeftImage from '../../assets/textures/house/door_left.png';
+import doorLeftOpenImage from '../../assets/textures/house/door_left_open.png';
+import doorAboveLeftImage from '../../assets/textures/house/door_above_left.png';
+import doorBottomRightImage from '../../assets/textures/house/door_right.png';
+import doorRightOpenImage from '../../assets/textures/house/door_right_open.png';
+import doorAboveRightImage from '../../assets/textures/house/door_above_right.png';
 
 let OutsideUnclesHouse: Room;
 
@@ -22,7 +28,12 @@ function newHouseSprite(x: number, y: number, solid = false): Tile {
 export const getOutsideUnclesHouse: RoomLoader = () => {
   if (!OutsideUnclesHouse) {
     const builder = new RoomBuilder(20, 20, lightWorldField);
-    const [doorLeftTile, doorRightTile, aboveDoorLeftTile, aboveDoorRightTile] = doorTiles(getInsideUnclesHouse);
+    const [doorLeftTile, doorRightTile, aboveDoorLeftTile, aboveDoorRightTile] = doorTiles(
+      getInsideUnclesHouse,
+      [doorAboveLeftImage, doorAboveRightImage],
+      [doorBottomLeftImage, doorBottomRightImage],
+      [doorLeftOpenImage, doorRightOpenImage]
+    );
     for (let i = 0; i <= 6; i++) {
       for (let j = 0; j <= 5; j++) {
         let tile;

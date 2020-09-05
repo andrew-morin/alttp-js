@@ -226,12 +226,15 @@ export class Link extends AnimatedSprite {
         return;
       }
       pointsToCheck.forEach((point, index) => {
-        if (tile.collidesWithPoint(...point)) {
+        const [x, y] = point;
+        const localX = x - tile.x;
+        const localY = y - tile.y;
+        if (tile.collidesWithPoint(localX, localY)) {
           tile.updateOnCollision(this.startDoorTransition);
           collidedPoints[index] = true;
           collidedTile = tile;
-        } else if (tile.containsPoint(new Point(...point))) {
-          tile.updateOnOverlap();
+        } else if (tile.containsPoint(new Point(x, y))) {
+          tile.updateOnOverlap(localX, localY);
         }
       });
     });
