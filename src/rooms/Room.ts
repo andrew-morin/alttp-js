@@ -1,6 +1,7 @@
+import { Link } from '../entities/Link/Link';
 import Tile from '../tiles/Tile';
 
-export type RoomLoader = () => Room;
+export type RoomLoader = (link: Link) => Room;
 
 export default class Room {
   tileMap: Tile[][];

@@ -17,7 +17,7 @@ function newHouseSprite(x: number, y: number, solid = false): Tile {
   return new Tile(texture, 1.5, 1);
 }
 
-export const getInsideUnclesHouse: RoomLoader = () => {
+export const getInsideUnclesHouse: RoomLoader = (link) => {
   if (!OutsideUnclesHouse) {
     const builder = new RoomBuilder(20, 20, () => backgroundColorTile(0x3D2829));
     for (let i = 0; i <= 14; i++) {
@@ -28,5 +28,7 @@ export const getInsideUnclesHouse: RoomLoader = () => {
     }
     OutsideUnclesHouse = builder.build();
   }
+  link.x = 16 * 8 + 8;
+  link.y = 16 * 10 + 8;
   return OutsideUnclesHouse;
 };

@@ -21,8 +21,9 @@ export default function doorTiles(
   const secondDoorTile = doorTile(startDoorImages[1], new Rectangle(8, 0, 8, 16));
   if (openDoorImages) {
     let open = false;
-    const updateOnOverlap = function(localX: number, localY: number): void {
-      if (!open && localX <=0 || localX >= 15) {
+    const updateOnOverlap = function(this: Tile, globalX: number, globalY: number): void {
+      const localY = globalY - this.y;
+      if (!open && localY > 0 && localY < 15) {
         open = true;
         firstDoorTile.texture = Loader.shared.resources[openDoorImages[0]].texture;
         secondDoorTile.texture = Loader.shared.resources[openDoorImages[1]].texture;
