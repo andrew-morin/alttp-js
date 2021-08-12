@@ -25,20 +25,23 @@ export default class Tile extends Sprite {
   updateOnCollision: (startDoorTransition: Function) => void = _ => {}
   /* eslint-enable @typescript-eslint/no-empty-function */
 
-  constructor(texture: Texture, solid: boolean)
-  constructor(texture: Texture, cardinalSpeed: number, diagonalSpeed: number, collisionShape?: Rectangle)
-  constructor(texture: Texture, cardinalSpeedOrSolid: number | boolean, diagonalSpeed = 0, collisionShape?: Rectangle) {
+  constructor(texture: Texture, solid?: boolean)
+  constructor(texture: Texture, collisionShape: Rectangle)
+  constructor(texture: Texture, cardinalSpeed: number, diagonalSpeed: number)
+  constructor(texture: Texture, solidOrCollisionShapeOrCardinalSpeed?: boolean | Rectangle | number, diagonalSpeed?: number) {
     super(texture);
 
-    if (typeof cardinalSpeedOrSolid === 'boolean') {
-      this.linkMovement = cardinalSpeedOrSolid ? SOLID_LINK_MOVEMENT : DEFAULT_LINK_MOVEMENT;
-      this.collisionShape = cardinalSpeedOrSolid ? SOLID_COLLISION_SHAPE : undefined;
-    } else {
-      this.linkMovement = {
-        cardinal: cardinalSpeedOrSolid,
+    if (typeof solidOrCollisionShapeOrCardinalSpeed === 'boolean') {
+      this.linkMovement = solidOrCollisionShapeOrCardinalSpeed ? SOLID_LINK_MOVEMENT : DEFAULT_LINK_MOVEMENT;
+      this.collisionShape = solidOrCollisionShapeOrCardinalSpeed ? SOLID_COLLISION_SHAPE : undefined;
+    } else if (typeof solidOrCollisionShapeOrCardinalSpeed === 'number') {
+      this.linkMovement = solidOrCollisionShapeOrCardinalSpeed && diagonalSpeed ? {
+        cardinal: solidOrCollisionShapeOrCardinalSpeed,
         diagonal: diagonalSpeed
-      };
-      this.collisionShape = collisionShape;
+      } : DEFAULT_LINK_MOVEMENT;
+    } else {
+      this.linkMovement = DEFAULT_LINK_MOVEMENT;
+      this.collisionShape = solidOrCollisionShapeOrCardinalSpeed;
     }
   }
 

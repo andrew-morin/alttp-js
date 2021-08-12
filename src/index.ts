@@ -196,6 +196,7 @@ function doorTransitionMidState(delta: number): void {
     transitionCounter = 0;
     background.removeChildren();
     renderRoom(transitionRoomLoader(link));
+    updateGameScenePosition();
     return;
   }
 
@@ -237,8 +238,8 @@ function setup(): void {
   background = new Container();
   app.stage.addChild(gameScene);
 
-  renderRoom(getOutsideUnclesHouse(link));
   link = getLink(startDoorTransition);
+  renderRoom(getOutsideUnclesHouse(link));
   link.x = SCREEN_WIDTH / 2;
   link.y = SCREEN_HEIGHT / 2;
   gameScene.addChild(background, link);

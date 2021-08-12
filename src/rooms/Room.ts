@@ -2,6 +2,7 @@ import { Link } from '../entities/Link/Link';
 import Tile from '../tiles/Tile';
 
 export type RoomLoader = (link: Link) => Room;
+export type TileMap = number[][];
 
 export default class Room {
   tileMap: Tile[][];

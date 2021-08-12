@@ -1,34 +1,73 @@
-import {Loader, Rectangle} from 'pixi.js';
-import Room, { RoomBuilder, RoomLoader } from '../Room';
+import {Loader, Rectangle, Texture} from 'pixi.js';
+import Room, { RoomBuilder, RoomLoader, TileMap } from '../Room';
 import Tile from '../../tiles/Tile';
-import houseSprite from '../../assets/textures/inside_uncles_house.png';
 import backgroundColorTile from '../../tiles/BackgroundColorTile';
+import { singleTileDoorTiles } from '../../tiles/light-world/DoorTiles';
+import { getOutsideUnclesHouse } from './OutsideUnclesHouse';
+import houseSprite from '../../assets/textures/uncles-house/house.png';
 
-let OutsideUnclesHouse: Room;
+let InsideUnclesHouse: Room,
+    backOfDoorTile: Tile,
+    enterDoorTile: Tile;
+
+const tileMap: TileMap = [
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+  [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+  [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+  [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+  [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+  [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+  [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+  [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0]
+];
 
 function newHouseSprite(x: number, y: number, solid = false): Tile {
   const texture = Loader.shared.resources[houseSprite].texture.clone();
   const rectangle = new Rectangle(16 * x, 16 * y, 16, 16);
   texture.frame = rectangle;
 
-  if (solid) {
-    return new Tile(texture, true);
+  return new Tile(texture, solid);
+}
+
+function getDoorTextures(): Texture[] {
+  const doorPoints = [[7, 11], [7, 10]];
+  return doorPoints.map(([x, y]) => {
+    const texture = Loader.shared.resources[houseSprite].texture.clone();
+    const rectangle = new Rectangle(16 * x, 16 * y, 16, 16);
+    texture.frame = rectangle;
+    return texture;
+  });
+}
+
+function getTileFromType(tileType: number, x: number, y: number): Tile {
+  switch (tileType) {
+    case 0: return newHouseSprite(x, y, true);
+    case 1: return newHouseSprite(x, y);
+    case 100: return enterDoorTile;
+    case 101: return backOfDoorTile;
   }
-  return new Tile(texture, 1.5, 1);
+  throw 'Invalid tile type';
 }
 
 export const getInsideUnclesHouse: RoomLoader = (link) => {
-  if (!OutsideUnclesHouse) {
+  if (!InsideUnclesHouse) {
+    [enterDoorTile, backOfDoorTile] = singleTileDoorTiles(
+      getOutsideUnclesHouse,
+      getDoorTextures()
+    );
     const builder = new RoomBuilder(20, 20, () => backgroundColorTile(0x3D2829));
-    for (let i = 0; i <= 14; i++) {
-      for (let j = 0; j <= 11; j++) {
-        const tile = newHouseSprite(i, j, i <= 1 || j <= 1 || i >= 13 || j >= 10);
-        builder.setTile(i + 1, j + 1, tile);
-      }
-    }
-    OutsideUnclesHouse = builder.build();
+    tileMap.forEach((row, y) => {
+      row.forEach((tileType, x) => {
+        builder.setTile(x + 1, y + 1, getTileFromType(tileType, x, y));
+      });
+    });
+    InsideUnclesHouse = builder.build();
   }
   link.x = 16 * 8 + 8;
-  link.y = 16 * 10 + 8;
-  return OutsideUnclesHouse;
+  link.y = 16 * 11;
+  return InsideUnclesHouse;
 };
