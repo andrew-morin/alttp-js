@@ -7,10 +7,10 @@ export function crossTileDoorTiles(
   doorTextures: Texture[]
 ): [Tile, Tile, Tile, Tile] {
   const [firstBackOfDoorTexture, secondBackOfDoorTexture, firstEnterDoorTexture, secondEnterDoorTexture, firstOpenDoorTexture, secondOpenDoorTexture] = doorTextures;
-  const firstBackOfDoorTile = new Tile(firstBackOfDoorTexture, true);
-  const seconeBackOfDoorTile = new Tile(secondBackOfDoorTexture, true);
-  const firstEnterDoorTile = new Tile(firstEnterDoorTexture, new Rectangle(0, 0, 8, 16));
-  const secondEnterDoorTile = new Tile(secondEnterDoorTexture, new Rectangle(8, 0, 8, 16));
+  const firstBackOfDoorTile = new Tile(firstBackOfDoorTexture, { solid: true });
+  const seconeBackOfDoorTile = new Tile(secondBackOfDoorTexture, { solid: true });
+  const firstEnterDoorTile = new Tile(firstEnterDoorTexture, { collisionShape: new Rectangle(0, 0, 8, 16) });
+  const secondEnterDoorTile = new Tile(secondEnterDoorTexture, { collisionShape: new Rectangle(8, 0, 8, 16) });
   if (firstOpenDoorTexture && secondOpenDoorTexture) {
     let open = false;
     const updateOnOverlap = function(this: Tile, globalX: number, globalY: number): void {
@@ -41,8 +41,8 @@ export function singleTileDoorTiles(
   doorTextures: Texture[]
 ): [Tile, Tile] {
   const [backOfDoorTexture, enterDoorTexture, openDoorTexture] = doorTextures;
-  const backOfDoorTile = new Tile(backOfDoorTexture, true);
-  const enterDoorTile = new Tile(enterDoorTexture, false);
+  const backOfDoorTile = new Tile(backOfDoorTexture, { solid: true });
+  const enterDoorTile = new Tile(enterDoorTexture, { solid: false });
   if (openDoorTexture) {
     let open = false;
     const updateOnOverlap = function(this: Tile, globalX: number, globalY: number): void {

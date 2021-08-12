@@ -15,7 +15,7 @@ function newHouseSprite(x: number, y: number, solid = false): Tile {
   const rectangle = new Rectangle(16 * x, 16 * y, 16, 16);
   texture.frame = rectangle;
 
-  return new Tile(texture, solid);
+  return new Tile(texture, { solid });
 }
 
 function getDoorTextures(): Texture[] {

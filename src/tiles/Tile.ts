@@ -17,6 +17,8 @@ const DEFAULT_LINK_MOVEMENT = {
 
 const SOLID_COLLISION_SHAPE = new Rectangle(0, 0, 16, 16);
 
+export type TileOpts = { solid?: boolean; collisionShape?: Rectangle; cardinalSpeed?: number; diagonalSpeed?: number };
+
 export default class Tile extends Sprite {
   linkMovement: TileLinkMovement;
   collisionShape: Rectangle | undefined;
@@ -25,23 +27,21 @@ export default class Tile extends Sprite {
   updateOnCollision: (startDoorTransition: Function) => void = _ => {}
   /* eslint-enable @typescript-eslint/no-empty-function */
 
-  constructor(texture: Texture, solid?: boolean)
-  constructor(texture: Texture, collisionShape: Rectangle)
-  constructor(texture: Texture, cardinalSpeed: number, diagonalSpeed: number)
-  constructor(texture: Texture, solidOrCollisionShapeOrCardinalSpeed?: boolean | Rectangle | number, diagonalSpeed?: number) {
+  constructor(texture: Texture, opts: TileOpts = {}) {
     super(texture);
 
-    if (typeof solidOrCollisionShapeOrCardinalSpeed === 'boolean') {
-      this.linkMovement = solidOrCollisionShapeOrCardinalSpeed ? SOLID_LINK_MOVEMENT : DEFAULT_LINK_MOVEMENT;
-      this.collisionShape = solidOrCollisionShapeOrCardinalSpeed ? SOLID_COLLISION_SHAPE : undefined;
-    } else if (typeof solidOrCollisionShapeOrCardinalSpeed === 'number') {
-      this.linkMovement = solidOrCollisionShapeOrCardinalSpeed && diagonalSpeed ? {
-        cardinal: solidOrCollisionShapeOrCardinalSpeed,
-        diagonal: diagonalSpeed
-      } : DEFAULT_LINK_MOVEMENT;
+    if (opts.solid !== undefined) {
+      this.linkMovement = opts.solid ? SOLID_LINK_MOVEMENT : DEFAULT_LINK_MOVEMENT;
+      this.collisionShape = opts.solid ? SOLID_COLLISION_SHAPE : undefined;
+    } else if (opts.cardinalSpeed && opts.diagonalSpeed) {
+      this.linkMovement = {
+        cardinal: opts.cardinalSpeed,
+        diagonal: opts.diagonalSpeed
+      };
+      this.collisionShape = opts.collisionShape;
     } else {
       this.linkMovement = DEFAULT_LINK_MOVEMENT;
-      this.collisionShape = solidOrCollisionShapeOrCardinalSpeed;
+      this.collisionShape = opts.collisionShape;
     }
   }
 

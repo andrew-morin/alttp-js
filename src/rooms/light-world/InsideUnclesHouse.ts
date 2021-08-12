@@ -1,6 +1,6 @@
 import {Loader, Rectangle, Texture} from 'pixi.js';
 import Room, { RoomBuilder, RoomLoader, TileMap } from '../Room';
-import Tile from '../../tiles/Tile';
+import Tile, { TileOpts } from '../../tiles/Tile';
 import backgroundColorTile from '../../tiles/BackgroundColorTile';
 import { singleTileDoorTiles } from '../../tiles/light-world/DoorTiles';
 import { getOutsideUnclesHouse } from './OutsideUnclesHouse';
@@ -13,24 +13,24 @@ let InsideUnclesHouse: Room,
 const tileMap: TileMap = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 10, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+  [0, 0, 10, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+  [0, 0, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
   [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
   [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-  [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-  [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-  [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-  [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-  [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+  [0, 0, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+  [0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0],
   [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0]
 ];
 
-function newHouseSprite(x: number, y: number, solid = false): Tile {
+function newHouseSprite(x: number, y: number, opts?: TileOpts): Tile {
   const texture = Loader.shared.resources[houseSprite].texture.clone();
   const rectangle = new Rectangle(16 * x, 16 * y, 16, 16);
   texture.frame = rectangle;
 
-  return new Tile(texture, solid);
+  return new Tile(texture, opts);
 }
 
 function getDoorTextures(): Texture[] {
@@ -45,8 +45,10 @@ function getDoorTextures(): Texture[] {
 
 function getTileFromType(tileType: number, x: number, y: number): Tile {
   switch (tileType) {
-    case 0: return newHouseSprite(x, y, true);
+    case 0: return newHouseSprite(x, y, { solid: true });
     case 1: return newHouseSprite(x, y);
+    case 2: return newHouseSprite(x, y, { collisionShape: new Rectangle(0, 8, 16, 8) }); // solid on bottom half
+    case 10: return newHouseSprite(x, y, { solid: true }); // Eventually becomes a pot
     case 100: return enterDoorTile;
     case 101: return backOfDoorTile;
   }
