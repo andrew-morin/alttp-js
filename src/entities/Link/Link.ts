@@ -1,15 +1,12 @@
 import {
   AnimatedSprite,
   Container,
-  DisplayObject,
   Loader,
-  Point,
-  Rectangle,
   Spritesheet,
 } from "pixi.js";
 import invariant from "invariant";
 import Tile from "tiles/Tile";
-import { Keyboard, StartDoorTransitionFn } from "../../index";
+import { Keyboard, StartDoorTransitionFn } from "../../main";
 import { detectCollisions } from "./collisionDetection";
 
 enum Direction {
