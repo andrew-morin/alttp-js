@@ -1,5 +1,5 @@
 import { Container, DisplayObject, Point, Rectangle } from "pixi.js";
-import Tile from "/tiles/Tile";
+import Tile from "tiles/Tile";
 import { Link } from "./Link";
 
 function detectCollisionHelper(
@@ -19,9 +19,8 @@ function detectCollisionHelper(
     ) {
       return;
     }
-    pointsToCheck.forEach((point, index) => {
-      if (tile.collidesWithPoint(point)) {
-        tile.updateOnCollision(link.startDoorTransition);
+    pointsToCheck.forEach(({ x, y }, index) => {
+      if (tile.collidesWithPoint(x, y)) {
         collidedPoints[index] = true;
         collidedTile = tile;
       }
@@ -30,15 +29,12 @@ function detectCollisionHelper(
   return [collidedTile, collidedPoints];
 }
 
-function detectOverlapHelper(
-  pointsToCheck: Point[],
-  tilesToCheck: DisplayObject[]
-): void {
-  tilesToCheck.forEach((child) => {
+function detectOverlapHelper(link: Link, pointsToCheck: Point[], tilesToCheck: DisplayObject[]): void {
+  tilesToCheck.forEach(child => {
     const tile = child as Tile;
     pointsToCheck.forEach((point) => {
       if (tile.overlapsWithPoint(point)) {
-        tile.updateOnOverlap(point);
+        tile.updateOnOverlap(link, point.x, point.y);
       }
     });
   });
@@ -136,9 +132,9 @@ export function detectCollisions(
     new Point(newX + 7, newY + 7),
     new Point(newX + 7, newY - 8),
     new Point(newX - 8, newY + 7),
-    new Point(newX - 8, newY - 8),
+    new Point(newX - 8, newY - 8)
   ];
-  detectOverlapHelper(overlapPointsToCheck, tilesToCheck);
+  detectOverlapHelper(link, overlapPointsToCheck, tilesToCheck);
 
   return [newX, newY];
 }
