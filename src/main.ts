@@ -63,6 +63,7 @@ let state: (delta: number) => void,
   keyboard: Keyboard,
   gameScene: Container,
   background: Container,
+  foreground: Container,
   gameOverScene: Container;
 
 function resetKeyboardToggles(keyboard: Keyboard): void {
@@ -165,6 +166,10 @@ function renderRoom(room: Room): void {
         const x = tileIndex * 16;
         tile.setTransform(x, y);
         background.addChild(tile);
+        if (tile.foregroundTile) {
+          tile.foregroundTile.setTransform(x, y);
+          foreground.addChild(tile.foregroundTile);
+        }
       }
     });
   });
@@ -211,6 +216,7 @@ function doorTransitionMidState(delta: number): void {
     state = doorTransitionEndState;
     transitionCounter = 0;
     background.removeChildren();
+    foreground.removeChildren();
     renderRoom(transitionRoomLoader(link));
     updateGameScenePosition();
     return;
@@ -262,13 +268,14 @@ function setup(): void {
   //Make the game scene and add it to the stage
   gameScene = new Container();
   background = new Container();
+  foreground = new Container();
   app.stage.addChild(gameScene);
 
   link = getLink(startDoorTransition);
   renderRoom(getOutsideUnclesHouse(link));
   link.x = SCREEN_WIDTH / 2;
   link.y = SCREEN_HEIGHT / 2;
-  gameScene.addChild(background, link);
+  gameScene.addChild(background, link, foreground);
 
   //Create the `gameOver` scene
   gameOverScene = new Container();

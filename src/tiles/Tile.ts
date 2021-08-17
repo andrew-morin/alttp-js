@@ -28,6 +28,7 @@ export type TileOpts = {
 export default class Tile extends Sprite {
   linkMovement: TileLinkMovement;
   collisionShape: Rectangle | undefined;
+  foregroundTile: Tile | undefined;
   /* eslint-disable @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars */
   updateOnOverlap: (link: Link, globalX: number, globalY: number) => void = () => {}
   /* eslint-enable @typescript-eslint/no-empty-function */

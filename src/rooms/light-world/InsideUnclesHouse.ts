@@ -38,7 +38,7 @@ function getDoorTextures(): Texture[] {
 
 export const getInsideUnclesHouse: RoomLoader = (link) => {
   if (!InsideUnclesHouse) {
-    const [firstEnterDoorTile, secondEnterDoorTile, firstBackOfDoorTile, seconeBackOfDoorTile] = crossTileDoorTiles(
+    const [firstEnterDoorTile, secondEnterDoorTile, firstBackOfDoorTile, secondBackOfDoorTile] = crossTileDoorTiles(
       getOutsideUnclesHouse,
       getDoorTextures(),
       true
@@ -47,11 +47,11 @@ export const getInsideUnclesHouse: RoomLoader = (link) => {
       '-1': firstEnterDoorTile,
       '-2': secondEnterDoorTile,
       '-3': firstBackOfDoorTile,
-      '-4': seconeBackOfDoorTile
+      '-4': secondBackOfDoorTile
     };
     InsideUnclesHouse = buildRoom(houseSprite, tileMap, { backgroundColor: 0x3D2829, doorTileMap });
   }
-  link.x = 16 * 7 + 8;
-  link.y = 16 * 10;
+  link.x = 16 * 8;
+  link.y = 16 * 14;
   return InsideUnclesHouse;
 };

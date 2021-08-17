@@ -46,11 +46,9 @@ export class RoomBuilder {
   }
 }
 
-function newHouseSprite(x: number, y: number, roomSprite: string, opts?: TileOpts): Tile {
+function newHouseSprite(frame: Rectangle, roomSprite: string, opts?: TileOpts): Tile {
   const texture = Loader.shared.resources[roomSprite].texture.clone();
-  const rectangle = new Rectangle(16 * x, 16 * y, 16, 16);
-  texture.frame = rectangle;
-
+  texture.frame = frame;
   return new Tile(texture, opts);
 }
 
@@ -79,9 +77,10 @@ function getCurriedNewTileFn(roomSprite: string): (x: number, y: number) => (opt
         textureStartX = x;
         textureStartY = y;
       }
-      const localX = x - textureStartX;
-      const localY = y - textureStartY;
-      return newHouseSprite(localX, localY, roomSprite, opts);
+      const frameX = x - textureStartX;
+      const frameY = y - textureStartY;
+      const frame = new Rectangle(16 * frameX, 16 * frameY, 16, 16);
+      return newHouseSprite(frame, roomSprite, opts);
     };
   };
 }
