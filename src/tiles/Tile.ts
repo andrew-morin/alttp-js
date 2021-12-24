@@ -1,4 +1,5 @@
-import {Rectangle, Sprite, Texture} from 'pixi.js';
+import { Rectangle, Sprite, Texture } from 'pixi.js';
+import { StartDoorTransitionFn } from 'src';
 
 interface TileLinkMovement {
   cardinal: number;
@@ -23,8 +24,8 @@ export default class Tile extends Sprite {
   linkMovement: TileLinkMovement;
   collisionShape: Rectangle | undefined;
   /* eslint-disable @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars */
-  updateOnOverlap: (globalX: number, globalY: number) => void = () => {}
-  updateOnCollision: (startDoorTransition: Function) => void = _ => {}
+  updateOnOverlap: (localX: number, localY: number) => void = () => {};
+  updateOnCollision: (startDoorTransition: StartDoorTransitionFn) => void = (_) => {};
   /* eslint-enable @typescript-eslint/no-empty-function */
 
   constructor(texture: Texture, opts: TileOpts = {}) {
@@ -58,7 +59,6 @@ export default class Tile extends Sprite {
   overlapsWithPoint(globalX: number, globalY: number): boolean {
     const localX = globalX - this.x;
     const localY = globalY - this.y;
-    return localX < this.width && localX > 0 &&
-      localY < this.height && localY > 0;
+    return localX < this.width && localX > 0 && localY < this.height && localY > 0;
   }
 }

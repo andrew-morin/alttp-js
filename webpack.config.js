@@ -12,6 +12,9 @@ module.exports = {
     path: path.resolve(__dirname, 'dist')
   },
   performance: { hints: false },
+  optimization: {
+    moduleIds: 'named'
+  },
   devtool: "inline-source-map",
   devServer: {
     contentBase: path.resolve(__dirname, 'dist'),
@@ -32,9 +35,7 @@ module.exports = {
       },
       {
         test: /\.(png|svg|jpg|gif)$/,
-        use: [
-          'file-loader'
-        ]
+        type: 'asset/resource'
       },
       {
         test: /\.(j|t)s$/,
@@ -48,11 +49,11 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: "A Link to the Past JS"
     }),
-    new webpack.NamedModulesPlugin(),
     new webpack.HotModuleReplacementPlugin(),
-    new CopyWebpackPlugin([{
-      from: 'src/assets',
-      to: 'assets'
-    }])
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: 'src/assets', to: 'assets' }
+      ]
+    })
   ]
 };

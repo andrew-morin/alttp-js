@@ -1,7 +1,7 @@
-import { AnimatedSprite, Container, Loader, Spritesheet } from 'pixi.js';
+import { AnimatedSprite, Container, DisplayObject, Loader, Point, Rectangle, Spritesheet } from 'pixi.js';
+import invariant from 'invariant';
 import Tile from '../../tiles/Tile';
-import { Keyboard } from '../../index';
-import { detectCollisions } from './collisionDetection';
+import { Keyboard, StartDoorTransitionFn } from '../../index';
 
 enum Direction {
   UP = 'up',
@@ -21,15 +21,16 @@ interface LinkState {
 }
 
 export class Link extends AnimatedSprite {
-  startDoorTransition: Function;
+  startDoorTransition: StartDoorTransitionFn;
   xSub: number;
   ySub: number;
   spritesheet: Spritesheet | undefined;
   state: LinkState;
 
-  constructor(startDoorTransition: Function) {
+  constructor(startDoorTransition: StartDoorTransitionFn) {
     const linkMovementSheet = Loader.shared.resources['assets/textures/link/LinkMovement.json'].spritesheet;
     const standDownTexture = linkMovementSheet?.textures[`${Action.STAND}_${Direction.DOWN}.png`];
+    invariant(standDownTexture, 'Missing Link Texture');
     super([standDownTexture]);
     this.startDoorTransition = startDoorTransition;
 
@@ -70,10 +71,14 @@ export class Link extends AnimatedSprite {
     if (this.hasLinkStateChanged(this.state, newState)) {
       this.state = newState;
       if (newAction === Action.WALK) {
-        this.textures = this.spritesheet?.animations[`${Action.WALK}_${newDirection}`];
+        const walkTexture = this.spritesheet?.animations[`${Action.WALK}_${newDirection}`];
+        invariant(walkTexture, 'Missing Link Texture');
+        this.textures = walkTexture;
         this.play();
       } else if (newAction === Action.STAND) {
-        this.textures = [this.spritesheet?.textures[`${Action.STAND}_${newDirection}.png`]];
+        const standTexture = this.spritesheet?.textures[`${Action.STAND}_${newDirection}.png`];
+        invariant(standTexture, 'Missing Link Texture');
+        this.textures = [standTexture];
       }
     }
 
@@ -141,7 +146,7 @@ export class Link extends AnimatedSprite {
     const subpixel = movement % 1;
     const [finalVx, xSub] = this.updateVelocityAndSubpixel(this.xSub, subpixel * vx, speed * vx);
     const [finalVy, ySub] = this.updateVelocityAndSubpixel(this.ySub, subpixel * vy, speed * vy);
-    const [newX, newY] = detectCollisions(this, finalVx, finalVy, background);
+    const [newX, newY] = this.detectCollisions(finalVx, finalVy, background);
     this.x = newX;
     this.xSub = xSub;
     this.y = newY;
@@ -257,7 +262,7 @@ export class Link extends AnimatedSprite {
 }
 
 let link: Link;
-export function getLink(startDoorTransition: Function): Link {
+export function getLink(startDoorTransition: StartDoorTransitionFn): Link {
   if (link) {
     return link;
   }

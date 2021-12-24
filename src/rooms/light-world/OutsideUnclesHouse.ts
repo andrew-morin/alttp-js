@@ -1,4 +1,5 @@
-import {Loader, Rectangle, Texture} from 'pixi.js';
+import { Loader, Rectangle, Texture } from 'pixi.js';
+import invariant from 'invariant';
 import Room, { RoomBuilder, RoomLoader } from '../Room';
 import Tile from '../../tiles/Tile';
 import lightWorldField from '../../tiles/light-world/LightWorldField';
@@ -11,7 +12,9 @@ import doorRightOpenImage from '../../assets/textures/outside-uncles-house/door_
 let OutsideUnclesHouse: Room;
 
 function newHouseSprite(x: number, y: number, solid = false): Tile {
-  const texture = Loader.shared.resources[houseSprite].texture.clone();
+  const houseTexture = Loader.shared.resources[houseSprite].texture;
+  invariant(houseTexture, 'Missing OutsideUnceHouse texture');
+  const texture = houseTexture.clone();
   const rectangle = new Rectangle(16 * x, 16 * y, 16, 16);
   texture.frame = rectangle;
 
@@ -19,15 +22,24 @@ function newHouseSprite(x: number, y: number, solid = false): Tile {
 }
 
 function getDoorTextures(): Texture[] {
-  const doorPoints = [[2, 4], [3, 4], [2, 5], [3, 5]];
+  const doorPoints = [
+    [2, 4],
+    [3, 4],
+    [2, 5],
+    [3, 5]
+  ];
   const doorTextures = doorPoints.map(([x, y]) => {
-    const texture = Loader.shared.resources[houseSprite].texture.clone();
+    const houseTexture = Loader.shared.resources[houseSprite].texture;
+    invariant(houseTexture, 'Missing House Texture');
+    const texture = houseTexture.clone();
     const rectangle = new Rectangle(16 * x, 16 * y, 16, 16);
     texture.frame = rectangle;
     return texture;
   });
-  const openDoorTextures = [doorLeftOpenImage, doorRightOpenImage].map(image => {
-    return Loader.shared.resources[image].texture.clone();
+  const openDoorTextures = [doorLeftOpenImage, doorRightOpenImage].map((image) => {
+    const openDoorTexture = Loader.shared.resources[image].texture;
+    invariant(openDoorTexture, 'Missing Open Door Texture');
+    return openDoorTexture.clone();
   });
   return doorTextures.concat(openDoorTextures);
 }

@@ -227,6 +227,8 @@ function doorTransitionStartState(delta: number): void {
   transitionCounter++;
 }
 
+export type StartDoorTransitionFn = (loadRoom: RoomLoader) => void;
+
 function startDoorTransition(loadRoom: RoomLoader): void {
   transitionRoomLoader = loadRoom;
   state = doorTransitionStartState;
