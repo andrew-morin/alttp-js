@@ -1,28 +1,28 @@
-const path = require('path');
-const webpack = require('webpack');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
+const path = require("path");
+const webpack = require("webpack");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const CleanWebpackPlugin = require("clean-webpack-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 module.exports = {
-  mode: 'development',
-  entry: './src/index',
+  mode: "development",
+  entry: "./src/index",
   output: {
-    filename: 'main.js',
-    path: path.resolve(__dirname, 'dist')
+    filename: "main.js",
+    path: path.resolve(__dirname, "dist"),
   },
   performance: { hints: false },
   optimization: {
-    moduleIds: 'named'
+    moduleIds: "named",
   },
   devtool: "inline-source-map",
   devServer: {
-    contentBase: path.resolve(__dirname, 'dist'),
+    contentBase: path.resolve(__dirname, "dist"),
     open: true,
-    hot: true
+    hot: true,
   },
   resolve: {
-    extensions: ['.js', '.json', '.ts']
+    extensions: [".js", ".json", ".ts"],
   },
   module: {
     rules: [
@@ -30,30 +30,28 @@ module.exports = {
         test: /\.(j|t)s$/,
         exclude: /node_modules/,
         use: {
-          loader: 'babel-loader'
-        }
+          loader: "babel-loader",
+        },
       },
       {
         test: /\.(png|svg|jpg|gif)$/,
-        type: 'asset/resource'
+        type: "asset/resource",
       },
       {
         test: /\.(j|t)s$/,
         use: ["source-map-loader"],
-        enforce: "pre"
-      }
-    ]
+        enforce: "pre",
+      },
+    ],
   },
   plugins: [
-    new CleanWebpackPlugin(['dist']),
+    new CleanWebpackPlugin(["dist"]),
     new HtmlWebpackPlugin({
-      title: "A Link to the Past JS"
+      title: "A Link to the Past JS",
     }),
     new webpack.HotModuleReplacementPlugin(),
     new CopyWebpackPlugin({
-      patterns: [
-        { from: 'src/assets', to: 'assets' }
-      ]
-    })
-  ]
+      patterns: [{ from: "src/assets", to: "assets" }],
+    }),
+  ],
 };

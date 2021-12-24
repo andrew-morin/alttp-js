@@ -22,7 +22,9 @@ export class RoomBuilder {
   height: number;
 
   constructor(width: number, height: number, defaultTile: () => Tile) {
-    this.tileMap = Array.from({length: height}, () => Array.from({length: width}, () => defaultTile()));
+    this.tileMap = Array.from({ length: height }, () =>
+      Array.from({ length: width }, () => defaultTile())
+    );
     this.width = width;
     this.height = height;
   }

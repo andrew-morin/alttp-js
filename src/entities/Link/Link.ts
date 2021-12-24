@@ -1,18 +1,26 @@
-import { AnimatedSprite, Container, DisplayObject, Loader, Point, Rectangle, Spritesheet } from 'pixi.js';
-import invariant from 'invariant';
-import Tile from '../../tiles/Tile';
-import { Keyboard, StartDoorTransitionFn } from '../../index';
+import {
+  AnimatedSprite,
+  Container,
+  DisplayObject,
+  Loader,
+  Point,
+  Rectangle,
+  Spritesheet,
+} from "pixi.js";
+import invariant from "invariant";
+import Tile from "../../tiles/Tile";
+import { Keyboard, StartDoorTransitionFn } from "../../index";
 
 enum Direction {
-  UP = 'up',
-  DOWN = 'down',
-  LEFT = 'left',
-  RIGHT = 'right'
+  UP = "up",
+  DOWN = "down",
+  LEFT = "left",
+  RIGHT = "right",
 }
 
 enum Action {
-  STAND = 'stand',
-  WALK = 'walk'
+  STAND = "stand",
+  WALK = "walk",
 }
 
 interface LinkState {
@@ -28,9 +36,12 @@ export class Link extends AnimatedSprite {
   state: LinkState;
 
   constructor(startDoorTransition: StartDoorTransitionFn) {
-    const linkMovementSheet = Loader.shared.resources['assets/textures/link/LinkMovement.json'].spritesheet;
-    const standDownTexture = linkMovementSheet?.textures[`${Action.STAND}_${Direction.DOWN}.png`];
-    invariant(standDownTexture, 'Missing Link Texture');
+    const linkMovementSheet =
+      Loader.shared.resources["assets/textures/link/LinkMovement.json"]
+        .spritesheet;
+    const standDownTexture =
+      linkMovementSheet?.textures[`${Action.STAND}_${Direction.DOWN}.png`];
+    invariant(standDownTexture, "Missing Link Texture");
     super([standDownTexture]);
     this.startDoorTransition = startDoorTransition;
 
@@ -44,7 +55,7 @@ export class Link extends AnimatedSprite {
     this.spritesheet = linkMovementSheet;
     this.state = {
       action: Action.STAND,
-      direction: Direction.DOWN
+      direction: Direction.DOWN,
     };
   }
 
@@ -55,10 +66,15 @@ export class Link extends AnimatedSprite {
     const vy = down.pressed ? 1 : up.pressed ? -1 : 0;
     const moving = vx !== 0 || vy !== 0;
     const newAction = moving ? Action.WALK : Action.STAND;
-    const newDirection = this.getNewDirection(directionChange, vx, vy, direction);
+    const newDirection = this.getNewDirection(
+      directionChange,
+      vx,
+      vy,
+      direction
+    );
     const newState = {
       action: newAction,
-      direction: newDirection
+      direction: newDirection,
     };
 
     // Reset subpixels when direction has changed
@@ -71,13 +87,15 @@ export class Link extends AnimatedSprite {
     if (this.hasLinkStateChanged(this.state, newState)) {
       this.state = newState;
       if (newAction === Action.WALK) {
-        const walkTexture = this.spritesheet?.animations[`${Action.WALK}_${newDirection}`];
-        invariant(walkTexture, 'Missing Link Texture');
+        const walkTexture =
+          this.spritesheet?.animations[`${Action.WALK}_${newDirection}`];
+        invariant(walkTexture, "Missing Link Texture");
         this.textures = walkTexture;
         this.play();
       } else if (newAction === Action.STAND) {
-        const standTexture = this.spritesheet?.textures[`${Action.STAND}_${newDirection}.png`];
-        invariant(standTexture, 'Missing Link Texture');
+        const standTexture =
+          this.spritesheet?.textures[`${Action.STAND}_${newDirection}.png`];
+        invariant(standTexture, "Missing Link Texture");
         this.textures = [standTexture];
       }
     }
@@ -103,14 +121,26 @@ export class Link extends AnimatedSprite {
   }
 
   hasLinkStateChanged(oldState: LinkState, newState: LinkState): boolean {
-    return oldState.action !== newState.action || oldState.direction !== newState.direction;
+    return (
+      oldState.action !== newState.action ||
+      oldState.direction !== newState.direction
+    );
   }
 
   shouldUpdateHorizDirection(vy: number, direction: Direction): boolean {
-    return vy === 0 || (vy === 1 && Direction.DOWN !== direction) || (vy === -1 && Direction.UP !== direction);
+    return (
+      vy === 0 ||
+      (vy === 1 && Direction.DOWN !== direction) ||
+      (vy === -1 && Direction.UP !== direction)
+    );
   }
 
-  getNewDirection(directionChange: boolean, vx: number, vy: number, direction: Direction): Direction {
+  getNewDirection(
+    directionChange: boolean,
+    vx: number,
+    vy: number,
+    direction: Direction
+  ): Direction {
     if (directionChange && (vx !== 0 || vy !== 0)) {
       switch (vx) {
         case 0:
@@ -131,7 +161,11 @@ export class Link extends AnimatedSprite {
     return direction;
   }
 
-  updateVelocityAndSubpixel(subpixel: number, subpixelChange: number, velocity: number): [number, number] {
+  updateVelocityAndSubpixel(
+    subpixel: number,
+    subpixelChange: number,
+    velocity: number
+  ): [number, number] {
     let newSubpixel = subpixel + subpixelChange;
     const update = Math.floor(newSubpixel);
     if (update !== 0) {
@@ -141,11 +175,24 @@ export class Link extends AnimatedSprite {
     return [velocity, newSubpixel];
   }
 
-  updatePosition(movement: number, vx: number, vy: number, background: Container): void {
+  updatePosition(
+    movement: number,
+    vx: number,
+    vy: number,
+    background: Container
+  ): void {
     const speed = Math.floor(movement);
     const subpixel = movement % 1;
-    const [finalVx, xSub] = this.updateVelocityAndSubpixel(this.xSub, subpixel * vx, speed * vx);
-    const [finalVy, ySub] = this.updateVelocityAndSubpixel(this.ySub, subpixel * vy, speed * vy);
+    const [finalVx, xSub] = this.updateVelocityAndSubpixel(
+      this.xSub,
+      subpixel * vx,
+      speed * vx
+    );
+    const [finalVy, ySub] = this.updateVelocityAndSubpixel(
+      this.ySub,
+      subpixel * vy,
+      speed * vy
+    );
     const [newX, newY] = this.detectCollisions(finalVx, finalVy, background);
     this.x = newX;
     this.xSub = xSub;
@@ -153,7 +200,11 @@ export class Link extends AnimatedSprite {
     this.ySub = ySub;
   }
 
-  detectCollisions(vx: number, vy: number, background: Container): [number, number] {
+  detectCollisions(
+    vx: number,
+    vy: number,
+    background: Container
+  ): [number, number] {
     const linkRow = Math.floor(this.y / 16);
     const rowsToCheck = [linkRow - 1, linkRow, linkRow + 1];
     const linkCol = Math.floor(this.x / 16);
@@ -172,12 +223,23 @@ export class Link extends AnimatedSprite {
       newY = this.y + vy;
     let xPointsToCheck: Point[] | undefined;
     if (vx > 0) {
-      xPointsToCheck = [new Point(newX + 8, this.y + 7), new Point(newX + 8, this.y), new Point(newX + 8, this.y - 8)];
+      xPointsToCheck = [
+        new Point(newX + 8, this.y + 7),
+        new Point(newX + 8, this.y),
+        new Point(newX + 8, this.y - 8),
+      ];
     } else if (vx < 0) {
-      xPointsToCheck = [new Point(newX - 8, this.y + 7), new Point(newX - 8, this.y), new Point(newX - 8, this.y - 8)];
+      xPointsToCheck = [
+        new Point(newX - 8, this.y + 7),
+        new Point(newX - 8, this.y),
+        new Point(newX - 8, this.y - 8),
+      ];
     }
     if (xPointsToCheck) {
-      const [collidedTile, collidedPoints] = this.detectCollisionHelper(xPointsToCheck, tilesToCheck);
+      const [collidedTile, collidedPoints] = this.detectCollisionHelper(
+        xPointsToCheck,
+        tilesToCheck
+      );
       if (collidedTile) {
         const unitVelocity = vx / Math.abs(vx);
         const collisionShape = collidedTile.collisionShape as Rectangle;
@@ -196,12 +258,23 @@ export class Link extends AnimatedSprite {
     }
     let yPointsToCheck: Point[] | undefined;
     if (vy > 0) {
-      yPointsToCheck = [new Point(newX + 7, newY + 8), new Point(newX, newY + 8), new Point(newX - 8, newY + 8)];
+      yPointsToCheck = [
+        new Point(newX + 7, newY + 8),
+        new Point(newX, newY + 8),
+        new Point(newX - 8, newY + 8),
+      ];
     } else if (vy < 0) {
-      yPointsToCheck = [new Point(newX + 7, newY - 8), new Point(newX, newY - 8), new Point(newX - 8, newY - 8)];
+      yPointsToCheck = [
+        new Point(newX + 7, newY - 8),
+        new Point(newX, newY - 8),
+        new Point(newX - 8, newY - 8),
+      ];
     }
     if (yPointsToCheck) {
-      const [collidedTile, collidedPoints] = this.detectCollisionHelper(yPointsToCheck, tilesToCheck);
+      const [collidedTile, collidedPoints] = this.detectCollisionHelper(
+        yPointsToCheck,
+        tilesToCheck
+      );
       if (collidedTile) {
         const unitVelocity = vy / Math.abs(vy);
         const collisionShape = collidedTile.collisionShape as Rectangle;
@@ -222,12 +295,20 @@ export class Link extends AnimatedSprite {
     return [newX, newY];
   }
 
-  detectCollisionHelper(pointsToCheck: Point[], tilesToCheck: DisplayObject[]): [Tile | undefined, boolean[]] {
+  detectCollisionHelper(
+    pointsToCheck: Point[],
+    tilesToCheck: DisplayObject[]
+  ): [Tile | undefined, boolean[]] {
     const collidedPoints = new Array(pointsToCheck.length).fill(false);
     let collidedTile;
     tilesToCheck.forEach((child) => {
       const tile = child as Tile;
-      if (tile.x > this.x + 9 || tile.x < this.x - 25 || tile.y > this.y + 9 || tile.y < this.y - 25) {
+      if (
+        tile.x > this.x + 9 ||
+        tile.x < this.x - 25 ||
+        tile.y > this.y + 9 ||
+        tile.y < this.y - 25
+      ) {
         return;
       }
       pointsToCheck.forEach((point, index) => {

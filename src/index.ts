@@ -1,15 +1,21 @@
-import {Application, Container, Graphics, settings, SCALE_MODES} from 'pixi.js';
-import {loadTextures} from './textures';
-import Room, { RoomLoader } from './rooms/Room';
-import Tile from './tiles/Tile';
-import {getOutsideUnclesHouse} from './rooms/light-world/OutsideUnclesHouse';
-import {Link, getLink} from './entities/Link/Link';
+import {
+  Application,
+  Container,
+  Graphics,
+  settings,
+  SCALE_MODES,
+} from "pixi.js";
+import { loadTextures } from "./textures";
+import Room, { RoomLoader } from "./rooms/Room";
+import Tile from "./tiles/Tile";
+import { getOutsideUnclesHouse } from "./rooms/light-world/OutsideUnclesHouse";
+import { Link, getLink } from "./entities/Link/Link";
 
 // Set margin and remove padding from document body
 const BODY_MARGIN = 8;
-document.body.style.setProperty('margin', `${BODY_MARGIN}px`);
-document.body.style.setProperty('padding', '0');
-document.body.style.setProperty('height', 'calc(100vh - 16px)');
+document.body.style.setProperty("margin", `${BODY_MARGIN}px`);
+document.body.style.setProperty("padding", "0");
+document.body.style.setProperty("height", "calc(100vh - 16px)");
 
 // Disable interpolation when scaling
 settings.SCALE_MODE = SCALE_MODES.NEAREST;
@@ -27,7 +33,12 @@ const app = new Application({
   transparent: false,
 });
 
-const SCALE = Math.floor(Math.min((window.innerHeight - 2 * BODY_MARGIN) / SCREEN_HEIGHT, (window.innerWidth - 2 * BODY_MARGIN) / SCREEN_WIDTH));
+const SCALE = Math.floor(
+  Math.min(
+    (window.innerHeight - 2 * BODY_MARGIN) / SCREEN_HEIGHT,
+    (window.innerWidth - 2 * BODY_MARGIN) / SCREEN_WIDTH
+  )
+);
 app.renderer.resize(SCALE * SCREEN_WIDTH, SCALE * SCREEN_HEIGHT);
 app.stage.scale.set(SCALE);
 
@@ -36,7 +47,7 @@ interface Input {
   toggled: boolean;
 }
 
-type KeyDirection = 'up' | 'down' | 'left' | 'right';
+type KeyDirection = "up" | "down" | "left" | "right";
 
 export interface Keyboard {
   left: Input;
@@ -49,11 +60,11 @@ export interface Keyboard {
 //Define variables that might be used in more
 //than one function
 let state: (delta: number) => void,
-    link: Link,
-    keyboard: Keyboard,
-    gameScene: Container,
-    background: Container,
-    gameOverScene: Container;
+  link: Link,
+  keyboard: Keyboard,
+  gameScene: Container,
+  background: Container,
+  gameOverScene: Container;
 
 function resetKeyboardToggles(keyboard: Keyboard): void {
   keyboard.directionChange = false;
@@ -99,27 +110,27 @@ function createKeyboard(): Keyboard {
   const inputs: Keyboard = {
     left: {
       pressed: false,
-      toggled: false
+      toggled: false,
     },
     up: {
       pressed: false,
-      toggled: false
+      toggled: false,
     },
     right: {
       pressed: false,
-      toggled: false
+      toggled: false,
     },
     down: {
       pressed: false,
-      toggled: false
+      toggled: false,
     },
-    directionChange: false
+    directionChange: false,
   };
   const keycodes: { readonly [key: number]: KeyDirection } = {
-    37: 'left',
-    38: 'up',
-    39: 'right',
-    40: 'down'
+    37: "left",
+    38: "up",
+    39: "right",
+    40: "down",
   };
 
   function downHandler(event: KeyboardEvent): void {
@@ -141,8 +152,8 @@ function createKeyboard(): Keyboard {
     }
   }
 
-  window.addEventListener('keydown', downHandler, false);
-  window.addEventListener('keyup', upHandler, false);
+  window.addEventListener("keydown", downHandler, false);
+  window.addEventListener("keyup", upHandler, false);
 
   return inputs;
 }
@@ -177,10 +188,16 @@ function doorTransitionEndState(delta: number): void {
   }
 
   transitionGraphics.beginFill(0x000000);
-  transitionGraphics.drawRect(-SCREEN_WIDTH, -SCREEN_HEIGHT, 3 * SCREEN_WIDTH, 3 * SCREEN_HEIGHT);
+  transitionGraphics.drawRect(
+    -SCREEN_WIDTH,
+    -SCREEN_HEIGHT,
+    3 * SCREEN_WIDTH,
+    3 * SCREEN_HEIGHT
+  );
   transitionGraphics.beginHole();
-  const width = SCREEN_WIDTH * transitionCounter / DOOR_TRANSITION_END + 1;
-  const height = 1/2 * SCREEN_HEIGHT * transitionCounter / DOOR_TRANSITION_END + 1;
+  const width = (SCREEN_WIDTH * transitionCounter) / DOOR_TRANSITION_END + 1;
+  const height =
+    ((1 / 2) * SCREEN_HEIGHT * transitionCounter) / DOOR_TRANSITION_END + 1;
   transitionGraphics.drawEllipse(link.x, link.y, width, height);
   transitionGraphics.endHole();
   transitionGraphics.endFill();
@@ -208,7 +225,12 @@ function doorTransitionMidState(delta: number): void {
 function doorTransitionStartState(delta: number): void {
   transitionGraphics.clear();
   transitionGraphics.beginFill(0x000000);
-  transitionGraphics.drawRect(-SCREEN_WIDTH, -SCREEN_HEIGHT, 3 * SCREEN_WIDTH, 3 * SCREEN_HEIGHT);
+  transitionGraphics.drawRect(
+    -SCREEN_WIDTH,
+    -SCREEN_HEIGHT,
+    3 * SCREEN_WIDTH,
+    3 * SCREEN_HEIGHT
+  );
 
   if (transitionCounter >= DOOR_TRANSITION_END) {
     transitionGraphics.endFill();
@@ -218,8 +240,11 @@ function doorTransitionStartState(delta: number): void {
   }
 
   transitionGraphics.beginHole();
-  const width = SCREEN_WIDTH - SCREEN_WIDTH * transitionCounter / DOOR_TRANSITION_END;
-  const height = 1/2 * SCREEN_HEIGHT - 1/2 * SCREEN_HEIGHT * transitionCounter / DOOR_TRANSITION_END;
+  const width =
+    SCREEN_WIDTH - (SCREEN_WIDTH * transitionCounter) / DOOR_TRANSITION_END;
+  const height =
+    (1 / 2) * SCREEN_HEIGHT -
+    ((1 / 2) * SCREEN_HEIGHT * transitionCounter) / DOOR_TRANSITION_END;
   transitionGraphics.drawEllipse(link.x, link.y, width, height);
   transitionGraphics.endHole();
   transitionGraphics.endFill();
@@ -265,15 +290,15 @@ function setup(): void {
 //Add the canvas that Pixi automatically created for you to the HTML document
 document.body.appendChild(app.view);
 
-const stopButton = document.createElement('button');
-stopButton.innerText = 'Stop';
-stopButton.addEventListener('click', () => {
+const stopButton = document.createElement("button");
+stopButton.innerText = "Stop";
+stopButton.addEventListener("click", () => {
   if (app.ticker.started) {
     app.ticker.stop();
-    stopButton.innerText = 'Start';
+    stopButton.innerText = "Start";
   } else {
     app.ticker.start();
-    stopButton.innerText = 'Stop';
+    stopButton.innerText = "Stop";
   }
 });
 document.body.appendChild(stopButton);

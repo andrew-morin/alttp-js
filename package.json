@@ -11,7 +11,8 @@
     "watch": "webpack --watch",
     "lint": "eslint src --ext .js,.ts",
     "type-check": "tsc --noEmit",
-    "type-check:watch": "npm run type-check -- --watch"
+    "type-check:watch": "npm run type-check -- --watch",
+    "prepare": "husky install"
   },
   "author": "Andrew Morin <drewmorin@comcast.net>",
   "license": "MIT",
@@ -30,8 +31,11 @@
     "clean-webpack-plugin": "^1.0.0",
     "copy-webpack-plugin": "^10.2.0",
     "eslint": "^8.5.0",
+    "eslint-config-prettier": "^8.3.0",
     "html-webpack-plugin": "^5.5.0",
-    "husky": "^3.1.0",
+    "husky": "^7.0.4",
+    "lint-staged": "^12.1.4",
+    "prettier": "2.5.1",
     "source-map-loader": "^0.2.4",
     "typescript": "^3.9.7",
     "webpack": "^5.65.0",
@@ -42,9 +46,7 @@
     "invariant": "^2.2.4",
     "pixi.js": "^6.2.1"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run lint && npm run type-check"
-    }
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown"
   }
 }
