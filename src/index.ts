@@ -30,7 +30,6 @@ const app = new Application({
   width: SCREEN_WIDTH,
   height: SCREEN_HEIGHT,
   antialias: true,
-  transparent: false,
 });
 
 const SCALE = Math.floor(

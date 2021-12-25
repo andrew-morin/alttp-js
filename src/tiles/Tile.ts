@@ -70,7 +70,7 @@ export default class Tile extends Sprite {
     const localX = point.x - this.x;
     const localY = point.y - this.y;
     return (
-      localX < this.width && localX > 0 && localY < this.height && localY > 0
+      localX < this.width && localX >= 0 && localY < this.height && localY >= 0
     );
   }
 }
