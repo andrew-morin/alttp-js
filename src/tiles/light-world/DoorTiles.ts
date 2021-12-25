@@ -1,7 +1,7 @@
-import { Rectangle, Texture } from "pixi.js";
+import { Point, Rectangle, Texture } from "pixi.js";
 import Tile from "../Tile";
 import { RoomLoader } from "../../rooms/Room";
-import { StartDoorTransitionFn } from "src";
+import { StartDoorTransitionFn } from "../../index";
 
 export function crossTileDoorTiles(
   loadNextRoom: RoomLoader,
@@ -27,12 +27,8 @@ export function crossTileDoorTiles(
   });
   if (firstOpenDoorTexture && secondOpenDoorTexture) {
     let open = false;
-    const updateOnOverlap = function (
-      this: Tile,
-      globalX: number,
-      globalY: number
-    ): void {
-      const localY = globalY - this.y;
+    const updateOnOverlap = function (this: Tile, point: Point): void {
+      const localY = point.y - this.y;
       if (!open && localY > 0 && localY < 15) {
         open = true;
         firstEnterDoorTile.texture = firstOpenDoorTexture;
@@ -44,7 +40,9 @@ export function crossTileDoorTiles(
     secondEnterDoorTile.updateOnOverlap = updateOnOverlap;
   }
 
-  const updateOnCollision = function (startDoorTransition: Function): void {
+  const updateOnCollision = function (
+    startDoorTransition: StartDoorTransitionFn
+  ): void {
     startDoorTransition(loadNextRoom);
   };
 
@@ -68,12 +66,8 @@ export function singleTileDoorTiles(
   const enterDoorTile = new Tile(enterDoorTexture);
   if (openDoorTexture) {
     let open = false;
-    const updateOnOverlap = function (
-      this: Tile,
-      globalX: number,
-      globalY: number
-    ): void {
-      const localY = globalY - this.y;
+    const updateOnOverlap = function (this: Tile, point: Point): void {
+      const localY = point.y - this.y;
       if (!open && localY > 0 && localY < 15) {
         open = true;
         enterDoorTile.texture = openDoorTexture;

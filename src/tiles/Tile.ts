@@ -1,4 +1,4 @@
-import { Rectangle, Sprite, Texture } from "pixi.js";
+import { Point, Rectangle, Sprite, Texture } from "pixi.js";
 import { StartDoorTransitionFn } from "src";
 
 interface TileLinkMovement {
@@ -17,6 +17,7 @@ const DEFAULT_LINK_MOVEMENT = {
 };
 
 const SOLID_COLLISION_SHAPE = new Rectangle(0, 0, 16, 16);
+type UpdateOnOverlapFn = (point: Point) => void;
 
 export type TileOpts = {
   solid?: boolean;
@@ -29,7 +30,7 @@ export default class Tile extends Sprite {
   linkMovement: TileLinkMovement;
   collisionShape: Rectangle | undefined;
   /* eslint-disable @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars */
-  updateOnOverlap: (localX: number, localY: number) => void = () => {};
+  updateOnOverlap: UpdateOnOverlapFn = () => {};
   updateOnCollision: (startDoorTransition: StartDoorTransitionFn) => void = (
     _
   ) => {};
@@ -55,9 +56,9 @@ export default class Tile extends Sprite {
     }
   }
 
-  collidesWithPoint(globalX: number, globalY: number): boolean {
-    const localX = globalX - this.x;
-    const localY = globalY - this.y;
+  collidesWithPoint(point: Point): boolean {
+    const localX = point.x - this.x;
+    const localY = point.y - this.y;
     if (this.collisionShape) {
       return this.collisionShape.contains(localX, localY);
     }
@@ -65,9 +66,9 @@ export default class Tile extends Sprite {
     return false;
   }
 
-  overlapsWithPoint(globalX: number, globalY: number): boolean {
-    const localX = globalX - this.x;
-    const localY = globalY - this.y;
+  overlapsWithPoint(point: Point): boolean {
+    const localX = point.x - this.x;
+    const localY = point.y - this.y;
     return (
       localX < this.width && localX > 0 && localY < this.height && localY > 0
     );

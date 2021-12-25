@@ -8,7 +8,7 @@ import {
   Spritesheet,
 } from "pixi.js";
 import invariant from "invariant";
-import Tile from "../../tiles/Tile";
+import Tile from "tiles/Tile";
 import { Keyboard, StartDoorTransitionFn } from "../../index";
 
 enum Direction {
@@ -106,7 +106,7 @@ export class Link extends AnimatedSprite {
       let diagonal = 0;
       const standingTile = background.children.find((tile) => {
         if (tile instanceof Tile) {
-          return tile.containsPoint(this.getGlobalPosition());
+          return tile.overlapsWithPoint(this.getGlobalPosition());
         }
         return false;
       });
@@ -312,14 +312,12 @@ export class Link extends AnimatedSprite {
         return;
       }
       pointsToCheck.forEach((point, index) => {
-        const localX = point.x - tile.x;
-        const localY = point.y - tile.y;
-        if (tile.collidesWithPoint(localX, localY)) {
+        if (tile.collidesWithPoint(point)) {
           tile.updateOnCollision(this.startDoorTransition);
           collidedPoints[index] = true;
           collidedTile = tile;
-        } else if (tile.containsPoint(point)) {
-          tile.updateOnOverlap(localX, localY);
+        } else if (tile.overlapsWithPoint(point)) {
+          tile.updateOnOverlap(point);
         }
       });
     });

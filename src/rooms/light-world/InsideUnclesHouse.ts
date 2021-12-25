@@ -1,11 +1,11 @@
 import { Loader, Rectangle, Texture } from "pixi.js";
 import invariant from "invariant";
 import Room, { RoomBuilder, RoomLoader, TileMap } from "../Room";
-import Tile, { TileOpts } from "../../tiles/Tile";
-import backgroundColorTile from "../../tiles/BackgroundColorTile";
-import { singleTileDoorTiles } from "../../tiles/light-world/DoorTiles";
+import Tile, { TileOpts } from "tiles/Tile";
+import backgroundColorTile from "tiles/BackgroundColorTile";
+import { singleTileDoorTiles } from "tiles/light-world/DoorTiles";
 import { getOutsideUnclesHouse } from "./OutsideUnclesHouse";
-import houseSprite from "../../assets/textures/uncles-house/house.png";
+import houseSprite from "assets/textures/uncles-house/house.png";
 
 let InsideUnclesHouse: Room, backOfDoorTile: Tile, enterDoorTile: Tile;
 

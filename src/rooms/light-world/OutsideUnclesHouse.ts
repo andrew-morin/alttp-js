@@ -1,13 +1,13 @@
 import { Loader, Rectangle, Texture } from "pixi.js";
 import invariant from "invariant";
 import Room, { RoomBuilder, RoomLoader } from "../Room";
-import Tile from "../../tiles/Tile";
-import lightWorldField from "../../tiles/light-world/LightWorldField";
-import { crossTileDoorTiles } from "../../tiles/light-world/DoorTiles";
+import Tile from "tiles/Tile";
+import lightWorldField from "tiles/light-world/LightWorldField";
+import { crossTileDoorTiles } from "tiles/light-world/DoorTiles";
 import { getInsideUnclesHouse } from "./InsideUnclesHouse";
-import houseSprite from "../../assets/textures/outside-uncles-house/house.png";
-import doorLeftOpenImage from "../../assets/textures/outside-uncles-house/door_left_open.png";
-import doorRightOpenImage from "../../assets/textures/outside-uncles-house/door_right_open.png";
+import houseSprite from "assets/textures/outside-uncles-house/house.png";
+import doorLeftOpenImage from "assets/textures/outside-uncles-house/door_left_open.png";
+import doorRightOpenImage from "assets/textures/outside-uncles-house/door_right_open.png";
 
 let OutsideUnclesHouse: Room;
 
