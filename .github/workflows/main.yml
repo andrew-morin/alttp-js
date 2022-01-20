@@ -28,9 +28,10 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: Build
         run: |
-          yarn && yarn build
+          yarn
+          yarn build
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4.2.2
         with:
           branch: gh-pages # The branch the action should deploy to.
-          folder: . # The folder the action should deploy.
+          folder: build # The folder the action should deploy.
