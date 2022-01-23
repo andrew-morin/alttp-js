@@ -1,5 +1,5 @@
-import {Point, Rectangle, Sprite, Texture} from 'pixi.js';
-import { Link } from '../entities/Link/Link';
+import { Point, Rectangle, Sprite, Texture } from "pixi.js";
+import { Link } from "../entities/Link/Link";
 
 interface TileLinkMovement {
   cardinal: number;
@@ -30,7 +30,8 @@ export default class Tile extends Sprite {
   collisionShape: Rectangle | undefined;
   foregroundTile: Tile | undefined;
   /* eslint-disable @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars */
-  updateOnOverlap: (link: Link, globalX: number, globalY: number) => void = () => {}
+  updateOnOverlap: (link: Link, globalX: number, globalY: number) => void =
+    () => {};
   /* eslint-enable @typescript-eslint/no-empty-function */
 
   constructor(texture: Texture, opts: TileOpts = {}) {

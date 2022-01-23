@@ -9,6 +9,7 @@ import doorRightOpenImage from "assets/textures/outside-uncles-house/door_right_
 
 let OutsideUnclesHouse: Room;
 
+// prettier-ignore
 const tileMap: TileMap = [
   [11,  11,  11,  11,  11,  11,  11,  11,  11,  11,  11,  11,  11,  11,  11,  11,  11,  11,  11,  11],
   [11,   0,   0,   0,   0,   0,   0,  11,  11,  11,  11,  11,  11,  11,  11,  11,  11,  11,  11,  11],
@@ -60,15 +61,17 @@ function getDoorTextures(): Texture[] {
 export const getOutsideUnclesHouse: RoomLoader = (link) => {
   if (!OutsideUnclesHouse) {
     // const builder = new RoomBuilder(20, 20, lightWorldField);
-    const [leftEnterDoorTile, rightEnterDoorTile, leftBackOfDoorTile, rightBackOfDoorTile] = crossTileDoorTiles(
-      getInsideUnclesHouse,
-      getDoorTextures()
-    );
+    const [
+      leftEnterDoorTile,
+      rightEnterDoorTile,
+      leftBackOfDoorTile,
+      rightBackOfDoorTile,
+    ] = crossTileDoorTiles(getInsideUnclesHouse, getDoorTextures());
     const doorTileMap = {
-      '-1': leftBackOfDoorTile,
-      '-2': rightBackOfDoorTile,
-      '-3': leftEnterDoorTile,
-      '-4': rightEnterDoorTile
+      "-1": leftBackOfDoorTile,
+      "-2": rightBackOfDoorTile,
+      "-3": leftEnterDoorTile,
+      "-4": rightEnterDoorTile,
     };
     OutsideUnclesHouse = buildRoom(houseSprite, tileMap, { doorTileMap });
   }

@@ -7,12 +7,13 @@ module.exports = {
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
-    "prettier",
+    "plugin:prettier/recommended",
   ],
   globals: {
     Atomics: "readonly",
     SharedArrayBuffer: "readonly",
   },
+  ignorePatterns: [".eslintrc.js", "webpack.config.js"],
   parser: "@typescript-eslint/parser",
   parserOptions: {
     ecmaVersion: 2018,

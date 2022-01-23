@@ -3,9 +3,11 @@ import invariant from "invariant";
 import Room, { buildRoom, RoomLoader, TileMap } from "../Room";
 import { getOutsideUnclesHouse } from "./OutsideUnclesHouse";
 import houseSprite from "assets/textures/uncles-house/house.png";
+import { crossTileDoorTiles } from "tiles/light-world/DoorTiles";
 
 let InsideUnclesHouse: Room;
 
+// prettier-ignore
 const tileMap: TileMap = [
   [10, 10,  10,  10,  10,  10,  10,  10,  10,  10,  10,  10,  10,  10,  10,  10],
   [10, 10,  10,  10,  10,  10,  10,  10,  10,  10,  10,  10,  10,  10,  10,  10],
@@ -25,7 +27,12 @@ const tileMap: TileMap = [
 ];
 
 function getDoorTextures(): Texture[] {
-  const doorPoints = [[6, 10], [7, 10], [6, 9], [7, 9]];
+  const doorPoints = [
+    [6, 10],
+    [7, 10],
+    [6, 9],
+    [7, 9],
+  ];
   return doorPoints.map(([x, y]) => {
     const doorTexture = Loader.shared.resources[houseSprite].texture;
     invariant(doorTexture, "Missing Door Texture");
@@ -38,18 +45,22 @@ function getDoorTextures(): Texture[] {
 
 export const getInsideUnclesHouse: RoomLoader = (link) => {
   if (!InsideUnclesHouse) {
-    const [firstEnterDoorTile, secondEnterDoorTile, firstBackOfDoorTile, secondBackOfDoorTile] = crossTileDoorTiles(
-      getOutsideUnclesHouse,
-      getDoorTextures(),
-      true
-    );
+    const [
+      firstEnterDoorTile,
+      secondEnterDoorTile,
+      firstBackOfDoorTile,
+      secondBackOfDoorTile,
+    ] = crossTileDoorTiles(getOutsideUnclesHouse, getDoorTextures(), true);
     const doorTileMap = {
-      '-1': firstEnterDoorTile,
-      '-2': secondEnterDoorTile,
-      '-3': firstBackOfDoorTile,
-      '-4': secondBackOfDoorTile
+      "-1": firstEnterDoorTile,
+      "-2": secondEnterDoorTile,
+      "-3": firstBackOfDoorTile,
+      "-4": secondBackOfDoorTile,
     };
-    InsideUnclesHouse = buildRoom(houseSprite, tileMap, { backgroundColor: 0x3D2829, doorTileMap });
+    InsideUnclesHouse = buildRoom(houseSprite, tileMap, {
+      backgroundColor: 0x3d2829,
+      doorTileMap,
+    });
   }
   link.x = 16 * 8;
   link.y = 16 * 14;

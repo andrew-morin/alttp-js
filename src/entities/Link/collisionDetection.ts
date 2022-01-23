@@ -19,8 +19,8 @@ function detectCollisionHelper(
     ) {
       return;
     }
-    pointsToCheck.forEach(({ x, y }, index) => {
-      if (tile.collidesWithPoint(x, y)) {
+    pointsToCheck.forEach((point, index) => {
+      if (tile.collidesWithPoint(point)) {
         collidedPoints[index] = true;
         collidedTile = tile;
       }
@@ -29,8 +29,12 @@ function detectCollisionHelper(
   return [collidedTile, collidedPoints];
 }
 
-function detectOverlapHelper(link: Link, pointsToCheck: Point[], tilesToCheck: DisplayObject[]): void {
-  tilesToCheck.forEach(child => {
+function detectOverlapHelper(
+  link: Link,
+  pointsToCheck: Point[],
+  tilesToCheck: DisplayObject[]
+): void {
+  tilesToCheck.forEach((child) => {
     const tile = child as Tile;
     pointsToCheck.forEach((point) => {
       if (tile.overlapsWithPoint(point)) {
@@ -132,7 +136,7 @@ export function detectCollisions(
     new Point(newX + 7, newY + 7),
     new Point(newX + 7, newY - 8),
     new Point(newX - 8, newY + 7),
-    new Point(newX - 8, newY - 8)
+    new Point(newX - 8, newY - 8),
   ];
   detectOverlapHelper(link, overlapPointsToCheck, tilesToCheck);
 

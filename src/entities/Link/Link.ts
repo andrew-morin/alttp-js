@@ -1,9 +1,4 @@
-import {
-  AnimatedSprite,
-  Container,
-  Loader,
-  Spritesheet,
-} from "pixi.js";
+import { AnimatedSprite, Container, Loader, Spritesheet } from "pixi.js";
 import invariant from "invariant";
 import Tile from "tiles/Tile";
 import { Keyboard, StartDoorTransitionFn } from "../../main";
