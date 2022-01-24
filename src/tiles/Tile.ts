@@ -1,3 +1,4 @@
+import invariant from "invariant";
 import { Point, Rectangle, Sprite, Texture } from "pixi.js";
 import { Link } from "../entities/Link/Link";
 
@@ -16,18 +17,19 @@ const DEFAULT_LINK_MOVEMENT = {
   diagonal: 1,
 };
 
-const SOLID_COLLISION_SHAPE = new Rectangle(0, 0, 16, 16);
-
 export type TileOpts = {
   solid?: boolean;
   collisionShape?: Rectangle;
+  collisionShapes?: Rectangle[];
   cardinalSpeed?: number;
   diagonalSpeed?: number;
+  halfHeight?: boolean;
+  halfWidth?: boolean;
 };
 
 export default class Tile extends Sprite {
   linkMovement: TileLinkMovement;
-  collisionShape: Rectangle | undefined;
+  collisionShapes: Rectangle[] | undefined;
   foregroundTile: Tile | undefined;
   /* eslint-disable @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars */
   updateOnOverlap: (link: Link, globalX: number, globalY: number) => void =
@@ -37,31 +39,51 @@ export default class Tile extends Sprite {
   constructor(texture: Texture, opts: TileOpts = {}) {
     super(texture);
 
+    const width = opts.halfWidth ? 8 : 16;
+    const height = opts.halfHeight ? 8 : 16;
+    invariant(
+      width === texture.width,
+      `Incorrect width for Tile. Expected: ${width}, but was: ${texture.width}`
+    );
+    invariant(
+      height === texture.height,
+      `Incorrect height for Tile. Expected: ${height}, but was: ${texture.height}`
+    );
+
     if (opts.solid !== undefined) {
       this.linkMovement = opts.solid
         ? SOLID_LINK_MOVEMENT
         : DEFAULT_LINK_MOVEMENT;
-      this.collisionShape = opts.solid ? SOLID_COLLISION_SHAPE : undefined;
-    } else if (opts.cardinalSpeed && opts.diagonalSpeed) {
-      this.linkMovement = {
-        cardinal: opts.cardinalSpeed,
-        diagonal: opts.diagonalSpeed,
-      };
-      this.collisionShape = opts.collisionShape;
+      this.collisionShapes = opts.solid
+        ? [new Rectangle(0, 0, width, height)]
+        : undefined;
     } else {
-      this.linkMovement = DEFAULT_LINK_MOVEMENT;
-      this.collisionShape = opts.collisionShape;
+      this.collisionShapes = opts.collisionShapes
+        ? opts.collisionShapes
+        : opts.collisionShape
+        ? [opts.collisionShape]
+        : [];
+      if (opts.cardinalSpeed && opts.diagonalSpeed) {
+        this.linkMovement = {
+          cardinal: opts.cardinalSpeed,
+          diagonal: opts.diagonalSpeed,
+        };
+      } else {
+        this.linkMovement = DEFAULT_LINK_MOVEMENT;
+      }
     }
   }
 
-  collidesWithPoint(point: Point): boolean {
+  collidesWithPoint(point: Point): Rectangle | undefined {
     const localX = point.x - this.x;
     const localY = point.y - this.y;
-    if (this.collisionShape) {
-      return this.collisionShape.contains(localX, localY);
+    if (this.collisionShapes) {
+      return this.collisionShapes.find((shape) =>
+        shape.contains(localX, localY)
+      );
     }
 
-    return false;
+    return undefined;
   }
 
   overlapsWithPoint(point: Point): boolean {

@@ -159,19 +159,19 @@ function createKeyboard(): Keyboard {
 }
 
 function renderRoom(room: Room): void {
-  room.tileMap.forEach((row: Tile[], rowIndex: number) => {
-    const y = rowIndex * 16;
-    row.forEach((tile: Tile, tileIndex: number) => {
-      if (tile) {
-        const x = tileIndex * 16;
-        tile.setTransform(x, y);
-        background.addChild(tile);
-        if (tile.foregroundTile) {
-          tile.foregroundTile.setTransform(x, y);
-          foreground.addChild(tile.foregroundTile);
-        }
+  let accumulatedHeight = 0;
+  room.tileMap.forEach((row: Tile[]) => {
+    let accumulatedWidth = 0;
+    row.forEach((tile: Tile) => {
+      tile.setTransform(accumulatedWidth, accumulatedHeight);
+      background.addChild(tile);
+      if (tile.foregroundTile) {
+        tile.foregroundTile.setTransform(accumulatedWidth, accumulatedHeight);
+        foreground.addChild(tile.foregroundTile);
       }
+      accumulatedWidth += tile.width;
     });
+    accumulatedHeight += row[0].height;
   });
 }
 

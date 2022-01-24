@@ -6,9 +6,10 @@ function detectCollisionHelper(
   link: Link,
   pointsToCheck: Point[],
   tilesToCheck: DisplayObject[]
-): [Tile | undefined, boolean[]] {
+): [Tile | undefined, Rectangle | undefined, boolean[]] {
   const collidedPoints = new Array(pointsToCheck.length).fill(false);
   let collidedTile;
+  let collidedShape;
   tilesToCheck.forEach((child) => {
     const tile = child as Tile;
     if (
@@ -20,13 +21,15 @@ function detectCollisionHelper(
       return;
     }
     pointsToCheck.forEach((point, index) => {
-      if (tile.collidesWithPoint(point)) {
+      const maybeCollidedShape = tile.collidesWithPoint(point);
+      if (maybeCollidedShape) {
         collidedPoints[index] = true;
         collidedTile = tile;
+        collidedShape = maybeCollidedShape;
       }
     });
   });
-  return [collidedTile, collidedPoints];
+  return [collidedTile, collidedShape, collidedPoints];
 }
 
 function detectOverlapHelper(
@@ -48,22 +51,9 @@ export function detectCollisions(
   link: Link,
   vx: number,
   vy: number,
-  background: Container
+  background: Container,
+  isPush?: boolean
 ): [number, number] {
-  const linkRow = Math.floor(link.y / 16);
-  const rowsToCheck = [linkRow - 1, linkRow, linkRow + 1];
-  const linkCol = Math.floor(link.x / 16);
-  const colsToCheck = [linkCol - 1, linkCol, linkCol + 1];
-  const tilesPerRow = Math.floor(background.width / 16);
-  const tilesToCheck: DisplayObject[] = [];
-  rowsToCheck.forEach((row) => {
-    colsToCheck.forEach((col) => {
-      const index = row * tilesPerRow + col;
-      if (index >= 0 && index < background.children.length) {
-        tilesToCheck.push(background.getChildAt(index));
-      }
-    });
-  });
   let newX = link.x + vx,
     newY = link.y + vy;
   let xToCheck: number | undefined;
@@ -78,24 +68,23 @@ export function detectCollisions(
       new Point(xToCheck, link.y),
       new Point(xToCheck, link.y - 8),
     ];
-    const [collidedTile, collidedPoints] = detectCollisionHelper(
+    const [collidedTile, collidedShape, collidedPoints] = detectCollisionHelper(
       link,
       xPointsToCheck,
-      tilesToCheck
+      background.children
     );
-    if (collidedTile) {
+    if (collidedTile && collidedShape) {
       const unitVelocity = vx / Math.abs(vx);
-      const collisionShape = collidedTile.collisionShape as Rectangle;
-      const halfWidth = collisionShape.width / 2;
-      const centerOfTile = collidedTile.x + collisionShape.x + halfWidth;
+      const halfWidth = collidedShape.width / 2;
+      const centerOfTile = collidedTile.x + collidedShape.x + halfWidth;
       newX = centerOfTile + -unitVelocity * (halfWidth + 8);
-    }
 
-    if (vy === 0 && !collidedPoints[1]) {
-      if (collidedPoints[0]) {
-        newY -= 1;
-      } else if (collidedPoints[2]) {
-        newY += 1;
+      if (!isPush && vy === 0 && !collidedPoints[1]) {
+        if (collidedPoints[0]) {
+          [newX, newY] = detectCollisions(link, 0, -1, background, true);
+        } else if (collidedPoints[2]) {
+          [newX, newY] = detectCollisions(link, 0, 1, background, true);
+        }
       }
     }
   }
@@ -111,23 +100,22 @@ export function detectCollisions(
       new Point(newX, yToCheck),
       new Point(newX - 8, yToCheck),
     ];
-    const [collidedTile, collidedPoints] = detectCollisionHelper(
+    const [collidedTile, collidedShape, collidedPoints] = detectCollisionHelper(
       link,
       yPointsToCheck,
-      tilesToCheck
+      background.children
     );
-    if (collidedTile) {
+    if (collidedTile && collidedShape) {
       const unitVelocity = vy / Math.abs(vy);
-      const collisionShape = collidedTile.collisionShape as Rectangle;
-      const halfHeight = collisionShape.height / 2;
-      const centerOfTile = collidedTile.y + collisionShape.y + halfHeight;
+      const halfHeight = collidedShape.height / 2;
+      const centerOfTile = collidedTile.y + collidedShape.y + halfHeight;
       newY = centerOfTile + -unitVelocity * (halfHeight + 8);
 
-      if (vx === 0 && !collidedPoints[1]) {
-        if (collidedPoints[0]) {
-          newX -= 1;
-        } else if (collidedPoints[2]) {
-          newX += 1;
+      if (!isPush && vx === 0 && !collidedPoints[1]) {
+        if (collidedPoints[0] && !collidedPoints[2]) {
+          [newX, newY] = detectCollisions(link, -1, 0, background, true);
+        } else if (collidedPoints[2] && !collidedPoints[0]) {
+          [newX, newY] = detectCollisions(link, 1, 0, background, true);
         }
       }
     }
@@ -138,7 +126,7 @@ export function detectCollisions(
     new Point(newX - 8, newY + 7),
     new Point(newX - 8, newY - 8),
   ];
-  detectOverlapHelper(link, overlapPointsToCheck, tilesToCheck);
+  detectOverlapHelper(link, overlapPointsToCheck, background.children);
 
   return [newX, newY];
 }

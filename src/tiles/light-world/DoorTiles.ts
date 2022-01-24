@@ -5,6 +5,20 @@ import { Link } from "../../entities/Link/Link";
 
 const FIRST_TILE_COLLISION = new Rectangle(0, 0, 8, 16);
 const SECOND_TILE_COLLISION = new Rectangle(8, 0, 8, 16);
+const FIRST_ENTER_TILE_COLLISION_SHORTER = new Rectangle(0, 0, 8, 8);
+const SECOND_ENTER_TILE_COLLISION_SHORTER = new Rectangle(8, 0, 8, 8);
+const FIRST_ENTER_TILE_COLLISION_SHORTER_DOWN_FACING = new Rectangle(
+  0,
+  8,
+  8,
+  8
+);
+const SECOND_ENTER_TILE_COLLISION_SHORTER_DOWN_FACING = new Rectangle(
+  8,
+  8,
+  8,
+  8
+);
 
 // Foreground tiles are not always 16x16 squares and need to be positioned by their frame
 class ForegroundTile extends Tile {
@@ -25,10 +39,15 @@ class ForegroundTile extends Tile {
   }
 }
 
+interface DoorOpts {
+  downFacing?: boolean;
+  shorterCollision?: boolean;
+}
+
 export function crossTileDoorTiles(
   loadNextRoom: RoomLoader,
   doorTextures: Texture[],
-  downFacing?: boolean
+  opts: DoorOpts = {}
 ): [Tile, Tile, Tile, Tile] {
   const [
     firstBackOfDoorTexture,
@@ -44,11 +63,21 @@ export function crossTileDoorTiles(
   const secondBackOfDoorTile = new Tile(secondBackOfDoorTexture, {
     collisionShape: SECOND_TILE_COLLISION,
   });
+  const firstEnterTileCollision = !opts.shorterCollision
+    ? FIRST_TILE_COLLISION
+    : opts.downFacing
+    ? FIRST_ENTER_TILE_COLLISION_SHORTER_DOWN_FACING
+    : FIRST_ENTER_TILE_COLLISION_SHORTER;
+  const secondEnterTileCollision = !opts.shorterCollision
+    ? SECOND_TILE_COLLISION
+    : opts.downFacing
+    ? SECOND_ENTER_TILE_COLLISION_SHORTER_DOWN_FACING
+    : SECOND_ENTER_TILE_COLLISION_SHORTER;
   const firstEnterDoorTile = new Tile(firstEnterDoorTexture, {
-    collisionShape: FIRST_TILE_COLLISION,
+    collisionShape: firstEnterTileCollision,
   });
   const secondEnterDoorTile = new Tile(secondEnterDoorTexture, {
-    collisionShape: SECOND_TILE_COLLISION,
+    collisionShape: secondEnterTileCollision,
   });
   if (firstOpenDoorTexture && secondOpenDoorTexture) {
     let open = false;
@@ -77,7 +106,7 @@ export function crossTileDoorTiles(
     globalY: number
   ): void {
     // Down facing doors require Link to be at the bottom of the door
-    if (downFacing) {
+    if (opts.downFacing) {
       const localY = globalY - this.y;
       if (localY < 15) {
         return;
@@ -91,7 +120,7 @@ export function crossTileDoorTiles(
 
   const firstBackOfDoorForegroundTexture = firstBackOfDoorTexture.clone();
   const secondBackOfDoorForegroundTexture = secondBackOfDoorTexture.clone();
-  if (downFacing) {
+  if (opts.downFacing) {
     [
       firstBackOfDoorForegroundTexture,
       secondBackOfDoorForegroundTexture,
@@ -102,11 +131,13 @@ export function crossTileDoorTiles(
     });
     firstBackOfDoorTile.foregroundTile = new ForegroundTile(
       firstBackOfDoorForegroundTexture,
-      { x: 0, y: 8 }
+      { x: 0, y: 8 },
+      { halfHeight: true }
     );
     secondBackOfDoorTile.foregroundTile = new ForegroundTile(
       secondBackOfDoorForegroundTexture,
-      { x: 0, y: 8 }
+      { x: 0, y: 8 },
+      { halfHeight: true }
     );
   } else {
     firstBackOfDoorTile.foregroundTile = new ForegroundTile(
