@@ -290,6 +290,7 @@ function setup(): void {
   keyboard = createKeyboard();
   state = play;
 
+  app.ticker.maxFPS = 60;
   app.ticker.add((delta: number) => gameLoop(delta));
 }
 

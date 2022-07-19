@@ -7,6 +7,10 @@ import outsideUnclesHouse from "./assets/textures/outside-uncles-house/house.png
 import insideHouseSprite from "./assets/textures/uncles-house/house.png";
 import link from "./assets/textures/link.gif";
 
+module.hot?.dispose(() => {
+  Loader.shared.reset();
+});
+
 export function loadTextures(
   cb: (
     loader: Loader,

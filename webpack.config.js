@@ -18,9 +18,7 @@ module.exports = {
   },
   devtool: "inline-source-map",
   devServer: {
-    contentBase: path.resolve(__dirname, "dist"),
-    open: true,
-    hot: true,
+    static: ["dist"],
   },
   resolve: {
     extensions: [".js", ".json", ".ts"],
@@ -47,11 +45,10 @@ module.exports = {
     ],
   },
   plugins: [
-    new CleanWebpackPlugin(["dist"]),
+    new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       title: "A Link to the Past JS",
     }),
-    new webpack.HotModuleReplacementPlugin(),
     new CopyWebpackPlugin({
       patterns: [{ from: "src/assets", to: "assets" }],
     }),
