@@ -106,6 +106,10 @@ function getTileFromId(
           new Rectangle(8, 0, 8, 16),
         ],
       });
+    case 0x10: // solid on top-left corner only
+      return newTileFn({
+        collisionShape: new Rectangle(0, 0, 8, 8),
+      });
     case 0xa0: // half width, solid
       return newTileFn({ solid: true, halfWidth: true });
     case 0xa1: // half width, open
@@ -118,10 +122,10 @@ function getTileFromId(
       return newTileFn({ solid: true, halfHeight: true, halfWidth: true });
     case 0xa5: // half height and width, open
       return newTileFn({ halfHeight: true, halfWidth: true });
-    case 0x11: // background, half height
-      return backgroundColorTile(backgroundColor, { halfHeight: true });
-    case 10:
-      return backgroundColorTile(backgroundColor);
+    // case 0x11: // background, half height
+    //   return backgroundColorTile(backgroundColor, { halfHeight: true });
+    // case 10:
+    //   return backgroundColorTile(backgroundColor);
     case 11:
       return lightWorldField();
     case 100: // Eventually becomes a pot

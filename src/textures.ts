@@ -3,8 +3,8 @@ import lightWorldFieldImage from "./assets/textures/light-world/field.png";
 import lightWorldGrassImage from "./assets/textures/light-world/grass.png";
 import doorLeftOpenImage from "./assets/textures/outside-uncles-house/door_left_open.png";
 import doorRightOpenImage from "./assets/textures/outside-uncles-house/door_right_open.png";
-import outsideUnclesHouse from "./assets/textures/outside-uncles-house/house.png";
-import insideHouseSprite from "./assets/textures/uncles-house/house.png";
+import outsideUnclesHouse from "./assets/textures/outside-uncles-house/outside-uncles-house.png";
+import unclesHouseSprite from "./assets/textures/uncles-house/uncles_house.png";
 import link from "./assets/textures/link.gif";
 
 module.hot?.dispose(() => {
@@ -23,7 +23,7 @@ export function loadTextures(
     .add(doorLeftOpenImage)
     .add(doorRightOpenImage)
     .add(outsideUnclesHouse)
-    .add(insideHouseSprite)
+    .add(unclesHouseSprite)
     .add(link)
     .add("assets/textures/link/LinkMovement.json", {
       xhrType: LoaderResource.XHR_RESPONSE_TYPE.JSON,
