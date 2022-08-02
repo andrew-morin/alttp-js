@@ -1,7 +1,6 @@
 import invariant from "invariant";
 import { Loader, Rectangle } from "pixi.js";
 import { Link } from "../entities/Link/Link";
-import backgroundColorTile from "../tiles/BackgroundColorTile";
 import lightWorldField from "../tiles/light-world/LightWorldField";
 import Tile, { TileOpts } from "../tiles/Tile";
 
@@ -64,7 +63,7 @@ function getTileFromId(
   roomOpts: RoomOpts,
   newTileFn: (opts?: TileOpts) => Tile
 ): Tile {
-  const { backgroundColor, doorTileMap } = roomOpts;
+  const { doorTileMap } = roomOpts;
   switch (id) {
     case 0:
       return newTileFn({ solid: true });
